@@ -1,0 +1,261 @@
+ingredient,health_score
+sugar,-3
+brown sugar,-2
+cane sugar,-3
+icing sugar,-3
+castor sugar,-3
+liquid sugar,-3
+glucose,-2
+glucose syrup,-3
+liquid glucose,-3
+liquid glucose syrup,-3
+corn syrup,-3
+high fructose corn syrup,-4
+dextrose,-2
+maltodextrin,-2
+fructose,-2
+invert syrup,-2
+invert sugar syrup,-3
+jaggery,1
+honey,1
+molasses,0
+sweetened condensed milk,-2
+salt,-1
+sea salt,-1
+iodized salt,-1
+rock salt,-1
+black salt,-1
+sodium,-2
+ferrous salt,-1
+calcium salt,1
+potassium iodate,0
+palm oil,-2
+refined palm oil,-3
+vegetable oil,-1
+soybean oil,-1
+sunflower oil,0
+rice bran oil,2
+groundnut oil,1
+mustard oil,2
+canola oil,1
+olive oil,3
+coconut oil,1
+sesame oil,2
+cottonseed oil,-1
+butter,-1
+ghee,0
+vanaspati,-4
+hydrogenated vegetable fat,-4
+wheat flour,0
+refined wheat flour,-2
+refined wheat flour maida,-2
+refined flour,-2
+maida,-2
+whole wheat flour,3
+atta,3
+rice flour,1
+corn flour,0
+gram flour,3
+besan,3
+semolina,1
+suji,1
+oats,4
+rolled oats,4
+whole grain,4
+multigrain,3
+millets,4
+jowar,4
+bajra,4
+ragi,5
+quinoa,4
+barley,3
+rye,3
+poha,3
+flattened rice,3
+milk,2
+milk solids,0
+milk solids nonfat,0
+nonfat milk solids,0
+whole milk powder,0
+skim milk powder,1
+skimmed milk powder,1
+milk powder,0
+curd,3
+yogurt,3
+cheese,-1
+cream,-1
+buttermilk powder,0
+whey protein,2
+casein,1
+milk protein concentrate,1
+cocoa,1
+cocoa solids,1
+cocoa butter,1
+dark chocolate,1
+coffee,1
+almonds,4
+cashews,2
+peanuts,2
+walnuts,4
+pistachios,3
+hazelnuts,3
+raisins,2
+dates,3
+figs,3
+apricots,3
+fiber,5
+dietary fiber,5
+soluble fiber,5
+inulin,4
+soy lecithin,0
+lecithin,0
+soy protein,2
+soy flour,1
+pea protein,3
+isolate soy protein,1
+protein,3
+vitamins,3
+vitamin a,3
+vitamin b1,3
+vitamin b2,3
+vitamin b6,3
+vitamin b12,3
+vitamin c,4
+vitamin d,4
+vitamin e,4
+calcium,3
+iron,3
+zinc,3
+fruit pulp,3
+fruit extract,2
+apple pulp,3
+apple concentrate,1
+orange concentrate,1
+mango pulp,2
+banana puree,2
+tomato paste,2
+tomato powder,2
+dehydrated onion,2
+dehydrated garlic,2
+onion powder,2
+garlic powder,2
+spinach powder,4
+beetroot powder,4
+carrot powder,4
+banana powder,3
+potato flakes,0
+corn starch,0
+potato starch,0
+tapioca starch,0
+modified starch,-1
+starch,0
+pectin,2
+xanthan gum,0
+guar gum,1
+gelatin,-1
+stabilizer,-1
+emulsifier,-1
+emulsifier 322,0
+emulsifier 471,-1
+emulsifier 472e,-1
+322,0
+471,-1
+472e,-1
+raising agent,0
+raising agents,0
+baking soda,0
+500 i,0
+500 ii,0
+500(ii),0
+503 i,0
+503(ii),0
+503(i),0
+dough conditioner,-1
+flour treatment agent,-1
+acidity regulator,0
+citric acid,0
+lactic acid,0
+malic acid,0
+sodium benzoate,-3
+potassium sorbate,-2
+potassium metabisulphite,-3
+potassium metabisulfite,-3
+calcium propionate,-2
+preservatives,-2
+223,-2
+211,-3
+202,-2
+282,-2
+sulphite,-2
+sulfite,-2
+spices,2
+mixed spices,1
+herbs,3
+turmeric,4
+cumin,4
+coriander,4
+black pepper,4
+chilli powder,2
+ginger,4
+garlic,4
+basil,4
+oregano,4
+parsley,4
+curry leaves,4
+mint,4
+ajwain,4
+fennel,4
+sesame seeds,4
+chia seeds,5
+flax seeds,5
+pumpkin seeds,4
+melon seeds,4
+natural flavor,0
+natural flavour,0
+artificial flavor,-3
+artificial flavour,-3
+artificial milk flavor,-3
+artificial milk flavour,-3
+vanilla flavor,-1
+vanilla flavour,-1
+chocolate flavor,-1
+elaichi flavor,-1
+flavouring substances,-3
+flavoring substances,-3
+added flavouring substances,-3
+added flavoring substances,-3
+nature identical flavouring substances,-2
+nature identical flavoring substances,-2
+artificial flavouring substances,-3
+artificial flavoring substances,-3
+natural colour,0
+natural color,0
+permitted natural colour,0
+permitted natural color,0
+artificial colour,-4
+artificial color,-4
+caramel colour,-2
+caramel color,-2
+class ii caramel colour,-2
+annatto,1
+curcumin,2
+paprika extract,2
+150d,-2
+160b,1
+wheat,0
+cracker meal,-1
+biscuit base,-1
+bread crumbs,-1
+sucralose,-3
+aspartame,-4
+acesulfame potassium,-4
+stevia,2
+monosodium glutamate,-2
+msg,-2
+yeast extract,-1
+instant coffee,0
+tea extract,1
+banana chips,-1
+roasted chana,4
+makhana,5
+peanut butter,2

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Food Health Rating</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page-shell">
+        <section id="upload-panel" class="hero-card">
+            <div class="hero-copy">
+                <p class="eyebrow">AI-Based Food Health Rating System</p>
+                <h1>Check packaged food ingredients in seconds.</h1>
+                <p class="hero-text">
+                    Upload an ingredient label image, get a health rating, and receive guidance for common health conditions.
+                </p>
+            </div>
+
+            <form id="analyze-form" class="upload-card">
+                <label id="drop-zone" class="drop-zone" for="image-input">
+                    <input id="image-input" name="image" type="file" accept="image/*" hidden>
+                    <div class="drop-icon">+</div>
+                    <h2>Drag and drop your food label</h2>
+                    <p>or click to browse an image file</p>
+                    <span id="file-name" class="file-name">No file selected</span>
+                </label>
+
+                <button id="analyze-button" class="primary-button" type="submit">Analyze</button>
+
+                <div id="loading-state" class="loading-state hidden" aria-live="polite">
+                    <div class="spinner"></div>
+                    <span>Analyzing ingredient list...</span>
+                </div>
+
+                <p id="error-message" class="error-message hidden" aria-live="polite"></p>
+            </form>
+        </section>
+
+        <section id="results-panel" class="results-panel hidden">
+            <div class="results-header">
+                <div>
+                    <p class="eyebrow">Analysis Output</p>
+                    <h1>Food health report</h1>
+                    <p class="hero-text">Review the score, automatic illness recommendations, ingredient matches, and OCR text.</p>
+                </div>
+                <button id="analyze-another-button" class="secondary-button" type="button">Analyze another image</button>
+            </div>
+
+            <div class="score-grid">
+                <article class="result-card spotlight-card">
+                    <p class="section-label">Health Score</p>
+                    <div id="score-value" class="score-value">--</div>
+                    <div class="rating-row">
+                        <div id="star-rating" class="star-rating" aria-label="Star rating"></div>
+                        <span id="rating-label" class="rating-label">Waiting for analysis</span>
+                    </div>
+                    <span id="classification-badge" class="classification-badge moderate">Moderate</span>
+                </article>
+
+                <article class="result-card">
+                    <p class="section-label">Extracted Ingredients</p>
+                    <ul id="ingredient-list" class="token-list"></ul>
+                </article>
+            </div>
+
+            <div class="output-grid">
+                <article class="result-card advice-card">
+                    <div class="card-heading">
+                        <h2>Health Advice</h2>
+                        <span class="muted-chip">Automatic</span>
+                    </div>
+                    <p id="advice-text" class="advice-text"></p>
+                    <div>
+                        <p class="section-label">Condition-Based Recommendations</p>
+                        <ul id="recommendations-list" class="advice-list recommendation-list"></ul>
+                    </div>
+                    <div>
+                        <p class="section-label">Better Options</p>
+                        <ul id="better-options" class="advice-list"></ul>
+                    </div>
+                </article>
+
+                <article class="result-card">
+                    <div class="card-heading">
+                        <h2>OCR Text</h2>
+                        <span class="muted-chip">Scrollable</span>
+                    </div>
+                    <div id="ocr-text" class="ocr-box"></div>
+                </article>
+
+                <article class="result-card full-width-card">
+                    <div class="card-heading">
+                        <h2>Matched Ingredients</h2>
+                        <span class="muted-chip">Dataset mapping</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="match-table">
+                            <thead>
+                                <tr>
+                                    <th>OCR Ingredient</th>
+                                    <th>Matched Ingredient</th>
+                                    <th>Confidence</th>
+                                    <th>Health Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matched-table-body"></tbody>
+                        </table>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
