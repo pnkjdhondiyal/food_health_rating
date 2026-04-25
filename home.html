@@ -8,7 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -119,16 +118,15 @@
                 Food Health Rating
             </div>
 <div class="hidden md:flex items-center gap-8 font-manrope antialiased text-sm font-medium">
-<a class="text-emerald-600 dark:text-emerald-400 font-bold border-b-2 border-emerald-600 pb-1" href="{{ url_for('index') }}">Home</a>
-<a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('how_it_works') }}">How it Works</a>
-<a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="#analyzer">Analyze</a>
+<a class="text-emerald-600 dark:text-emerald-400 font-bold border-b-2 border-emerald-600 pb-1" href="#">Home</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="#">How it Works</a>
 <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="#">Ratings</a>
 <!-- <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="#">About</a> -->
 </div>
 <div class="flex items-center gap-4">
-<a class="hidden md:block px-5 py-2.5 bg-primary text-on-primary rounded-xl font-label-md transition-transform duration-150 active:scale-95 shadow-sm" href="#analyzer">
+<button class="hidden md:block px-5 py-2.5 bg-primary text-on-primary rounded-xl font-label-md transition-transform duration-150 active:scale-95 shadow-sm">
                     Get Started
-                </a>
+                </button>
 <button class="md:hidden p-2 text-on-surface">
 <span class="material-symbols-outlined">menu</span>
 </button>
@@ -147,9 +145,9 @@
                         Understand exactly what's in your packaged food with our transparent health rating system. We simplify complex labels into actionable data.
                     </p>
 <div class="flex flex-wrap gap-4">
-<a class="px-8 py-4 bg-primary text-on-primary rounded-full font-label-md text-lg shadow-lg hover:brightness-110 transition-all inline-flex" href="#analyzer">
+<button class="px-8 py-4 bg-primary text-on-primary rounded-full font-label-md text-lg shadow-lg hover:brightness-110 transition-all">
                             Scan a Product
-                        </a>
+                        </button>
 <button class="px-8 py-4 bg-white border border-outline-variant text-on-surface rounded-full font-label-md text-lg hover:bg-surface-container transition-all">
                             View Ratings
                         </button>
@@ -159,104 +157,6 @@
 <img alt="Healthy vs Processed foods comparison" class="w-full h-full object-cover" data-alt="split screen composition comparing fresh organic vegetables and vibrant fruits against colorful packaged snacks and processed food items in bright studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDApWnu5WyqXvakLwyNdyg4uEV3Jz6BIsBenMnnx3ybVfYRBQUi4n0ApEYo_ObQd1ZqqqRySyTwshhhbaj-hzhOzEaD57yNwnTQp1ux__SxTHTuNNzM30KvyQNpjQWwzoWzqWjdZ-48bb4eeXNLJuMbHBRbZQUTjK2I5ZkCoFJF2Njr8CSi0lvUElVZIpgKqpoizz86daEY1_qoAv4jQf5KXqJNPj5cawa2WFxazgunlGGPZkb4vPuBmq-1PYLjHJOsWtuJ00nGSSPu"/>
 <div class="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
 </div>
-</div>
-</section>
-<!-- Analyzer -->
-<section class="py-20 bg-surface-container-lowest" id="analyzer">
-<div class="max-w-7xl mx-auto px-6">
-<div id="upload-panel" class="hero-card">
-<div class="hero-copy">
-<p class="eyebrow">Live Analyzer</p>
-<h1>Upload a label and get the health report.</h1>
-<p class="hero-text">
-                    Add a packaged food ingredient image and the app will extract the text, match ingredients, score the product, and suggest who should avoid or limit it.
-                </p>
-</div>
-<form id="analyze-form" class="upload-card">
-<label id="drop-zone" class="drop-zone" for="image-input">
-<input id="image-input" name="image" type="file" accept="image/*" hidden>
-<div class="drop-icon">+</div>
-<h2>Drag and drop your ingredient label</h2>
-<p>or click to browse an image file</p>
-<span id="file-name" class="file-name">No file selected</span>
-</label>
-<button id="analyze-button" class="primary-button" type="submit">Analyze</button>
-<div id="loading-state" class="loading-state hidden" aria-live="polite">
-<div class="spinner"></div>
-<span>Analyzing ingredient list...</span>
-</div>
-<p id="error-message" class="error-message hidden" aria-live="polite"></p>
-</form>
-</div>
-<section id="results-panel" class="results-panel hidden mt-8">
-<div class="results-header">
-<div>
-<p class="eyebrow">Analysis Output</p>
-<h1>Food health report</h1>
-<p class="hero-text">Review the score, automatic illness recommendations, ingredient matches, and OCR text.</p>
-</div>
-<button id="analyze-another-button" class="secondary-button" type="button">Analyze another image</button>
-</div>
-<div class="score-grid">
-<article class="result-card spotlight-card">
-<p class="section-label">Health Score</p>
-<div id="score-value" class="score-value">--</div>
-<div class="rating-row">
-<div id="star-rating" class="star-rating" aria-label="Star rating"></div>
-<span id="rating-label" class="rating-label">Waiting for analysis</span>
-</div>
-<span id="classification-badge" class="classification-badge moderate">Moderate</span>
-</article>
-<article class="result-card">
-<p class="section-label">Extracted Ingredients</p>
-<ul id="ingredient-list" class="token-list"></ul>
-</article>
-</div>
-<div class="output-grid">
-<article class="result-card advice-card">
-<div class="card-heading">
-<h2>Health Advice</h2>
-<span class="muted-chip">Automatic</span>
-</div>
-<p id="advice-text" class="advice-text"></p>
-<div>
-<p class="section-label">Condition-Based Recommendations</p>
-<ul id="recommendations-list" class="advice-list recommendation-list"></ul>
-</div>
-<div>
-<p class="section-label">Better Options</p>
-<ul id="better-options" class="advice-list"></ul>
-</div>
-</article>
-<article class="result-card">
-<div class="card-heading">
-<h2>OCR Text</h2>
-<span class="muted-chip">Scrollable</span>
-</div>
-<div id="ocr-text" class="ocr-box"></div>
-</article>
-<article class="result-card full-width-card">
-<div class="card-heading">
-<h2>Matched Ingredients</h2>
-<span class="muted-chip">Dataset mapping</span>
-</div>
-<div class="table-wrap">
-<table class="match-table">
-<thead>
-<tr>
-<th>OCR Ingredient</th>
-<th>Matched Ingredient</th>
-<th>Confidence</th>
-<th>Health Score</th>
-<th>Caution Conditions</th>
-</tr>
-</thead>
-<tbody id="matched-table-body"></tbody>
-</table>
-</div>
-</article>
-</div>
-</section>
 </div>
 </section>
 <!-- Problem Statement -->
@@ -403,7 +303,7 @@
 <!-- Product Card 2 -->
 <div class="bg-white rounded-2xl overflow-hidden border border-outline-variant group">
 <div class="aspect-square overflow-hidden bg-surface-container-low relative">
-<img alt="Avvatar Protein Wafer Bar" class="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform" data-alt="Avvatar chocolate protein wafer bar placed on a bed of protein powder with a chocolate wafer piece behind it" src="{{ url_for('static', filename='avvatar-protein-wafer-bar.webp') }}"/>
+<img alt="High Protein Bar" class="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform" data-alt="A chocolate protein wafer bar shown with protein powder and a cross-section revealing the wafer layers" src="https://lh3.googleusercontent.com/aida/ADBb0uj4fghDYgE_mKRI2dczoHbDT8RZsoGhhdaHb7xM5kwQW9NODUxfTtVrE1OPnONmB0p8rShsAFIJMHaxZaNJoI-2h-KkhgEQBQ5HkNTe2NqmPcN7wCSMjWQHqYZTR_kProhrZeG-cbzq90ZysEtulYc1zVtyDGtx-QoPDgpm7fH17UvyBKVlMcfQeAqVKQ1TRIc5y0ygYJ1aIw96CZAYVYgGBgTUexvYg-2jyFFTGNDn0sSgZtqdNL4dOOystRtMcn04YgW0L_DQyho"/>
 <div class="absolute top-4 right-4 vitality-grade-b px-3 py-1 rounded-lg font-bold text-lg">4</div>
 </div>
 <div class="p-6">
@@ -484,5 +384,4 @@
 </div>
 </div>
 </footer>
-<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body></html>

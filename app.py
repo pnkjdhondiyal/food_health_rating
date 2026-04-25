@@ -30,6 +30,16 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/how-it-works", methods=["GET"])
+def how_it_works():
+    return render_template("howitworks.html")
+
+
+@app.route("/results", methods=["GET"])
+def results():
+    return render_template("results.html")
+
+
 @app.route("/analyze", methods=["POST"])
 def analyze():
     uploaded_file = request.files.get("image")

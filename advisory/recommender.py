@@ -28,6 +28,8 @@ ILLNESS_RULES = {
             "sweetened condensed milk",
         },
         "advice": "This product includes sugars or syrups that may raise blood glucose quickly.",
+        "limit_intro": "People managing diabetes should be careful with this product",
+        "avoid_intro": "People managing diabetes may want to avoid this product",
         "better_options": [
             "Choose unsweetened oats, roasted chana, or plain makhana.",
             "Prefer products with whole grains and no added sugar near the top of the ingredient list.",
@@ -52,6 +54,8 @@ ILLNESS_RULES = {
             "500(ii)",
         },
         "advice": "This product contains salt or sodium-based additives that may not be ideal for someone managing blood pressure.",
+        "limit_intro": "People with hypertension should keep this product occasional",
+        "avoid_intro": "People with hypertension may want to avoid this product",
         "better_options": [
             "Choose low-sodium roasted nuts, seeds, or plain khakhra.",
             "Look for products where salt appears lower in the ingredient list.",
@@ -73,6 +77,8 @@ ILLNESS_RULES = {
             "hydrogenated vegetable fat",
         },
         "advice": "The product contains refined fats or saturated-fat-heavy ingredients that are better limited for heart health.",
+        "limit_intro": "People with heart disease should keep this product limited",
+        "avoid_intro": "People with heart disease may want to avoid this product",
         "better_options": [
             "Choose snacks based on oats, millets, nuts, or seeds.",
             "Prefer labels using rice bran oil, mustard oil, or olive oil instead of palm oil.",
@@ -92,6 +98,8 @@ ILLNESS_RULES = {
             "sodium",
         },
         "advice": "The product may contain sodium or potassium additives that some kidney patients are advised to monitor closely.",
+        "limit_intro": "People with kidney disease should be cautious with this product",
+        "avoid_intro": "People with kidney disease may want to avoid this product",
         "better_options": [
             "Prefer simple homemade snacks with limited salt and fewer additives.",
             "Choose plain poha, unsalted seeds, or roasted chana if they fit your diet plan.",
@@ -114,6 +122,8 @@ ILLNESS_RULES = {
             "bread crumbs",
         },
         "advice": "This product appears to contain gluten-based grains and may not be suitable for someone with celiac disease.",
+        "limit_intro": "People with celiac disease should generally avoid this product",
+        "avoid_intro": "People with celiac disease should avoid this product",
         "better_options": [
             "Choose certified gluten-free options made with rice, jowar, bajra, or makhana.",
             "Prefer products based on millet flour, corn, or quinoa.",
@@ -142,6 +152,8 @@ ILLNESS_RULES = {
             "sweetened condensed milk",
         },
         "advice": "This product includes dairy-derived ingredients that may trigger discomfort for someone with lactose intolerance.",
+        "limit_intro": "People with lactose intolerance may want to keep this product limited",
+        "avoid_intro": "People with lactose intolerance may want to avoid this product",
         "better_options": [
             "Look for dairy-free snacks made with oats, millet, nuts, or coconut.",
             "Choose labels without milk solids, whey, casein, or cream.",
@@ -152,14 +164,15 @@ ILLNESS_RULES = {
 
 
 def generate_health_advice(matched_ingredients: List[Dict[str, object]]) -> Dict[str, object]:
-    recommendations = []
+    recommendations_by_condition = {}
     all_better_options = []
 
     for rule in ILLNESS_RULES.values():
         risk_flags = []
         for item in matched_ingredients:
             matched_name = str(item.get("matched_ingredient", "")).lower()
-            if matched_name in rule["risk_keywords"]:
+            caution_conditions = set(item.get("caution_conditions", []))
+            if matched_name in rule["risk_keywords"] or rule["display_name"].lower() in caution_conditions:
                 risk_flags.append(matched_name)
 
         unique_flags = sorted(set(risk_flags))
@@ -167,20 +180,17 @@ def generate_health_advice(matched_ingredients: List[Dict[str, object]]) -> Dict
             continue
 
         severity = "avoid" if len(unique_flags) >= 2 else "limit"
-        message = (
-            f"If you have {rule['display_name']}, "
-            f"{'it may be better to avoid this product' if severity == 'avoid' else 'consume this in limited quantity'} "
-            f"because it contains: {', '.join(unique_flags)}."
-        )
-        recommendations.append(
-            {
-                "condition": rule["display_name"],
-                "severity": severity,
-                "message": message,
-                "risk_flags": unique_flags,
-            }
-        )
+        intro = rule["avoid_intro"] if severity == "avoid" else rule["limit_intro"]
+        message = f"{intro} because it contains {', '.join(unique_flags)}."
+        recommendations_by_condition[rule["display_name"]] = {
+            "condition": rule["display_name"],
+            "severity": severity,
+            "message": message,
+            "risk_flags": unique_flags,
+        }
         all_better_options.extend(rule["better_options"])
+
+    recommendations = list(recommendations_by_condition.values())
 
     if not recommendations:
         return {
@@ -195,7 +205,7 @@ def generate_health_advice(matched_ingredients: List[Dict[str, object]]) -> Dict
 
     deduped_options = list(dict.fromkeys(all_better_options))
     return {
-        "advice": "Automatic recommendation: this product may not be ideal for some people with specific health conditions.",
+        "advice": "Automatic recommendation: this report highlights which health conditions may require extra caution with this product.",
         "better_options": deduped_options[:6],
         "recommendations": recommendations,
     }

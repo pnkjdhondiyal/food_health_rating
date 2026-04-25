@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Food Health Report</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#f8f9ff",
+              "surface": "#f8f9ff",
+              "primary": "#006c49",
+              "primary-container": "#10b981",
+              "on-primary": "#ffffff",
+              "on-surface": "#121c28",
+              "on-surface-variant": "#3c4a42",
+              "outline-variant": "#bbcabf"
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="bg-background font-body-md text-on-surface antialiased">
+    <header class="sticky top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
+        <nav class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+            <a class="text-xl font-extrabold tracking-tight text-slate-900 font-headline-md" href="{{ url_for('index') }}">
+                Food Health Rating
+            </a>
+            <div class="hidden md:flex items-center gap-8 font-manrope text-sm font-medium">
+                <a class="text-slate-600 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('index') }}">Home</a>
+                <a class="text-slate-600 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('how_it_works') }}">How it Works</a>
+                <a class="text-emerald-600 font-bold border-b-2 border-emerald-600 pb-1" href="{{ url_for('results') }}">Results</a>
+            </div>
+            <a class="px-5 py-2.5 bg-primary text-on-primary rounded-xl font-label-md shadow-sm" href="{{ url_for('index') }}#analyzer">
+                Analyze Another
+            </a>
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        <section id="results-panel" class="results-panel">
+            <div class="results-header">
+                <div>
+                    <p class="eyebrow">Analysis Output</p>
+                    <h1>Food health report</h1>
+                    <p class="hero-text">Review the score, automatic condition-based cautions, ingredient matches, and OCR text.</p>
+                </div>
+                <a class="secondary-button" href="{{ url_for('index') }}#analyzer">Analyze another image</a>
+            </div>
+
+            <div class="score-grid">
+                <article class="result-card spotlight-card">
+                    <p class="section-label">Health Score</p>
+                    <div id="score-value" class="score-value">--</div>
+                    <div class="rating-row">
+                        <div id="star-rating" class="star-rating" aria-label="Star rating"></div>
+                        <span id="rating-label" class="rating-label">Waiting for analysis</span>
+                    </div>
+                    <span id="classification-badge" class="classification-badge moderate">Moderate</span>
+                </article>
+
+                <article class="result-card">
+                    <p class="section-label">Extracted Ingredients</p>
+                    <ul id="ingredient-list" class="token-list"></ul>
+                </article>
+            </div>
+
+            <div class="output-grid">
+                <article class="result-card advice-card">
+                    <div class="card-heading">
+                        <h2>Health Advice</h2>
+                        <span class="muted-chip">Automatic</span>
+                    </div>
+                    <p id="advice-text" class="advice-text"></p>
+                    <div>
+                        <p class="section-label">Condition-Based Recommendations</p>
+                        <ul id="recommendations-list" class="advice-list recommendation-list"></ul>
+                    </div>
+                    <div>
+                        <p class="section-label">Better Options</p>
+                        <ul id="better-options" class="advice-list"></ul>
+                    </div>
+                </article>
+
+                <article class="result-card">
+                    <div class="card-heading">
+                        <h2>OCR Text</h2>
+                        <span class="muted-chip">Scrollable</span>
+                    </div>
+                    <div id="ocr-text" class="ocr-box"></div>
+                </article>
+
+                <article class="result-card full-width-card">
+                    <div class="card-heading">
+                        <h2>Matched Ingredients</h2>
+                        <span class="muted-chip">Dataset mapping</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="match-table">
+                            <thead>
+                                <tr>
+                                    <th>OCR Ingredient</th>
+                                    <th>Matched Ingredient</th>
+                                    <th>Confidence</th>
+                                    <th>Health Score</th>
+                                    <th>Caution Conditions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matched-table-body"></tbody>
+                        </table>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='results.js') }}"></script>
+</body>
+</html>

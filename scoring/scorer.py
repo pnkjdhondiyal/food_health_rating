@@ -31,15 +31,24 @@ def normalize_score(raw_score: float) -> float:
     return round(normalized, 2)
 
 
-def load_ingredient_scores() -> Dict[str, float]:
-    """Load ingredient scores from the CSV dataset."""
-    scores: Dict[str, float] = {}
-    with DATASET_PATH.open(mode="r", encoding="utf-8", newline="") as csv_file:
+def parse_caution_conditions(value: str) -> List[str]:
+    if not value:
+        return []
+    return [condition.strip() for condition in value.split("|") if condition.strip()]
+
+
+def load_ingredient_dataset() -> Dict[str, Dict[str, object]]:
+    """Load ingredient scores and condition cautions from the CSV dataset."""
+    dataset: Dict[str, Dict[str, object]] = {}
+    with DATASET_PATH.open(mode="r", encoding="utf-8-sig", newline="") as csv_file:
         reader = csv.DictReader(csv_file)
         for row in reader:
             ingredient = row["ingredient"].strip().lower()
-            scores[ingredient] = float(row["health_score"])
-    return scores
+            dataset[ingredient] = {
+                "health_score": float(row["health_score"]),
+                "caution_conditions": parse_caution_conditions(row.get("caution_conditions", "")),
+            }
+    return dataset
 
 
 def get_rating(score: float) -> int:
@@ -72,8 +81,8 @@ def get_classification(score: float | None) -> str:
 
 def calculate_health_rating(ingredients: List[str]) -> Dict[str, object]:
     """Fuzzy match OCR ingredients to the dataset and compute the average score."""
-    ingredient_scores = load_ingredient_scores()
-    dataset_ingredients = list(ingredient_scores.keys())
+    ingredient_dataset = load_ingredient_dataset()
+    dataset_ingredients = list(ingredient_dataset.keys())
     normalized_lookup = {normalize_ingredient_name(name): name for name in dataset_ingredients}
     normalized_dataset = list(normalized_lookup.keys())
     matched_ingredients = []
@@ -86,7 +95,8 @@ def calculate_health_rating(ingredients: List[str]) -> Dict[str, object]:
 
         if normalized_ingredient in normalized_lookup:
             matched_name = normalized_lookup[normalized_ingredient]
-            raw_score = ingredient_scores[matched_name]
+            ingredient_info = ingredient_dataset[matched_name]
+            raw_score = ingredient_info["health_score"]
             score = normalize_score(raw_score)
             matched_ingredients.append(
                 {
@@ -94,6 +104,7 @@ def calculate_health_rating(ingredients: List[str]) -> Dict[str, object]:
                     "matched_ingredient": matched_name,
                     "match_score": 100.0,
                     "health_score": score,
+                    "caution_conditions": ingredient_info["caution_conditions"],
                 }
             )
             matched_scores.append(score)
@@ -102,7 +113,8 @@ def calculate_health_rating(ingredients: List[str]) -> Dict[str, object]:
         match = process.extractOne(normalized_ingredient, normalized_dataset, scorer=fuzz.WRatio)
         if match and match[1] >= MATCH_THRESHOLD:
             matched_name = normalized_lookup[match[0]]
-            raw_score = ingredient_scores[matched_name]
+            ingredient_info = ingredient_dataset[matched_name]
+            raw_score = ingredient_info["health_score"]
             score = normalize_score(raw_score)
             matched_ingredients.append(
                 {
@@ -110,6 +122,7 @@ def calculate_health_rating(ingredients: List[str]) -> Dict[str, object]:
                     "matched_ingredient": matched_name,
                     "match_score": round(match[1], 2),
                     "health_score": score,
+                    "caution_conditions": ingredient_info["caution_conditions"],
                 }
             )
             matched_scores.append(score)
@@ -120,6 +133,7 @@ def calculate_health_rating(ingredients: List[str]) -> Dict[str, object]:
                     "matched_ingredient": "No good match found",
                     "match_score": 0,
                     "health_score": 0,
+                    "caution_conditions": [],
                 }
             )
 
