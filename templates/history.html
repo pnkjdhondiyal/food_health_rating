@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My History - Food Health Rating</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="results-header">
+            <div>
+                <p class="eyebrow">Saved Reports</p>
+                <h1>My scan history</h1>
+                <p class="hero-text">These reports are saved to your account so you do not need to scan the same product again.</p>
+            </div>
+            <a class="secondary-button" href="{{ url_for('index') }}#analyzer">Analyze Food</a>
+        </section>
+
+        {% for message in get_flashed_messages() %}
+            <p class="success-message">{{ message }}</p>
+        {% endfor %}
+
+        <section class="history-list">
+            {% if records %}
+                {% for record in records %}
+                    <article class="result-card history-card">
+                        <div>
+                            <p class="section-label">{{ record.created_at }}</p>
+                            <h2>{{ record.product_name or "Unnamed product" }}</h2>
+                            <p class="hero-text">{{ record.personalized_advice or "No personalized advice saved." }}</p>
+                        </div>
+                        <div class="history-score">
+                            <span class="classification-badge {{ (record.classification or 'Moderate').lower() }}">{{ record.classification or "Moderate" }}</span>
+                            <strong>{{ record.score if record.score is not none else "--" }}</strong>
+                            <a class="secondary-button" href="{{ url_for('history_detail', scan_id=record.id) }}">Open</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            {% else %}
+                <article class="result-card">
+                    <h2>No saved scans yet</h2>
+                    <p class="hero-text">Analyze a food label while logged in and the report will appear here.</p>
+                </article>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

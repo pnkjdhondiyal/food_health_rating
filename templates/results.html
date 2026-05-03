@@ -34,10 +34,14 @@
             <a class="text-xl font-extrabold tracking-tight text-slate-900 font-headline-md" href="{{ url_for('index') }}">
                 Food Health Rating
             </a>
-            <div class="hidden md:flex items-center gap-8 font-manrope text-sm font-medium">
+            <div class="nav-links items-center gap-8 font-manrope text-sm font-medium">
                 <a class="text-slate-600 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('index') }}">Home</a>
                 <a class="text-slate-600 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('how_it_works') }}">How it Works</a>
                 <a class="text-emerald-600 font-bold border-b-2 border-emerald-600 pb-1" href="{{ url_for('results') }}">Results</a>
+                {% if current_user %}
+                <a class="text-slate-600 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a class="text-slate-600 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('history') }}">My History</a>
+                {% endif %}
             </div>
             <a class="px-5 py-2.5 bg-primary text-on-primary rounded-xl font-label-md shadow-sm" href="{{ url_for('index') }}#analyzer">
                 Analyze Another
@@ -80,6 +84,7 @@
                         <span class="muted-chip">Automatic</span>
                     </div>
                     <p id="advice-text" class="advice-text"></p>
+                    <p id="personalized-advice" class="personalized-advice"></p>
                     <div>
                         <p class="section-label">Condition-Based Recommendations</p>
                         <ul id="recommendations-list" class="advice-list recommendation-list"></ul>

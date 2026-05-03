@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Food Health Rating</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page-shell auth-shell">
+        <section class="result-card auth-card">
+            <p class="eyebrow">Personal Food Assistant</p>
+            <h1>Create your account</h1>
+            <p class="hero-text">Save scanned products, set your health conditions, and see your previous reports next time you log in.</p>
+
+            {% for message in get_flashed_messages() %}
+                <p class="error-message">{{ message }}</p>
+            {% endfor %}
+
+            <form class="auth-form" method="post">
+                <label class="text-field">
+                    <span>Name</span>
+                    <input name="name" type="text" required>
+                </label>
+                <label class="text-field">
+                    <span>Email</span>
+                    <input name="email" type="email" required>
+                </label>
+                <label class="text-field">
+                    <span>Password</span>
+                    <input name="password" type="password" required>
+                </label>
+
+                <fieldset class="condition-grid">
+                    <legend>Health profile</legend>
+                    {% for condition in health_conditions %}
+                        <label>
+                            <input name="health_conditions" type="checkbox" value="{{ condition }}" {% if condition in selected_conditions %}checked{% endif %}>
+                            <span>{{ condition.title() }}</span>
+                        </label>
+                    {% endfor %}
+                </fieldset>
+
+                <button class="primary-button" type="submit">Create Account</button>
+            </form>
+
+            <p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+        </section>
+    </main>
+</body>
+</html>

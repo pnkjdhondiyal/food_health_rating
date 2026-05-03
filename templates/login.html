@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Food Health Rating</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page-shell auth-shell">
+        <section class="result-card auth-card">
+            <p class="eyebrow">Welcome Back</p>
+            <h1>Log in</h1>
+            <p class="hero-text">Open your saved scans and keep your health profile active while analyzing products.</p>
+
+            {% for message in get_flashed_messages() %}
+                <p class="error-message">{{ message }}</p>
+            {% endfor %}
+
+            <form class="auth-form" method="post">
+                <label class="text-field">
+                    <span>Email</span>
+                    <input name="email" type="email" value="{{ email }}" required>
+                </label>
+                <label class="text-field">
+                    <span>Password</span>
+                    <input name="password" type="password" required>
+                </label>
+                <button class="primary-button" type="submit">Log In</button>
+            </form>
+
+            <p class="auth-switch">New here? <a href="{{ url_for('signup') }}">Create an account</a></p>
+        </section>
+    </main>
+</body>
+</html>

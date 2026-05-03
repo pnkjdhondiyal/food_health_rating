@@ -1,6 +1,7 @@
 const form = document.getElementById("analyze-form");
 const dropZone = document.getElementById("drop-zone");
 const imageInput = document.getElementById("image-input");
+const productNameInput = document.getElementById("product-name-input");
 const fileName = document.getElementById("file-name");
 const analyzeButton = document.getElementById("analyze-button");
 const loadingState = document.getElementById("loading-state");
@@ -28,6 +29,7 @@ function updateFileName(file) {
 async function analyzeFile(file) {
     const formData = new FormData();
     formData.append("image", file);
+    formData.append("product_name", productNameInput.value || "");
 
     clearError();
     setLoading(true);

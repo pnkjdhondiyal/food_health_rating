@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Food Health Rating</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page-shell auth-shell">
+        <section class="result-card auth-card">
+            <p class="eyebrow">Health Profile</p>
+            <h1>{{ user.name }}</h1>
+            <p class="hero-text">{{ user.email }}</p>
+
+            {% for message in get_flashed_messages() %}
+                <p class="success-message">{{ message }}</p>
+            {% endfor %}
+
+            <form class="auth-form" method="post">
+                <fieldset class="condition-grid">
+                    <legend>Select conditions that matter for your food recommendations</legend>
+                    {% for condition in health_conditions %}
+                        <label>
+                            <input name="health_conditions" type="checkbox" value="{{ condition }}" {% if condition in selected_conditions %}checked{% endif %}>
+                            <span>{{ condition.title() }}</span>
+                        </label>
+                    {% endfor %}
+                </fieldset>
+                <button class="primary-button" type="submit">Save Profile</button>
+            </form>
+
+            <div class="auth-actions">
+                <a class="secondary-button" href="{{ url_for('history') }}">View History</a>
+                <a class="secondary-button" href="{{ url_for('index') }}#analyzer">Analyze Food</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

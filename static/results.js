@@ -6,6 +6,7 @@ const ingredientList = document.getElementById("ingredient-list");
 const ocrText = document.getElementById("ocr-text");
 const matchedTableBody = document.getElementById("matched-table-body");
 const adviceText = document.getElementById("advice-text");
+const personalizedAdvice = document.getElementById("personalized-advice");
 const recommendationsList = document.getElementById("recommendations-list");
 const betterOptions = document.getElementById("better-options");
 
@@ -101,6 +102,7 @@ function renderResults(data) {
     renderMatches(data.matched || []);
     ocrText.textContent = data.text || "No OCR text returned.";
     adviceText.textContent = data.advice || "No advice available.";
+    personalizedAdvice.textContent = data.personalized_advice || "";
 }
 
 const savedResult = sessionStorage.getItem("analysisResult");

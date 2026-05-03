@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Food Health Rating</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="dashboard-hero">
+            <div>
+                <p class="eyebrow">User Dashboard</p>
+                <h1>Welcome, {{ user.name }}</h1>
+                <p class="hero-text">
+                    Your food scans, health profile, and personal recommendations live here.
+                </p>
+            </div>
+            <div class="dashboard-actions">
+                <a class="primary-button" href="{{ url_for('index') }}#analyzer">Scan Product</a>
+                <a class="secondary-button" href="{{ url_for('profile') }}">Edit Profile</a>
+            </div>
+        </section>
+
+        {% for message in get_flashed_messages() %}
+            <p class="success-message">{{ message }}</p>
+        {% endfor %}
+
+        <section class="dashboard-grid">
+            <article class="result-card">
+                <p class="section-label">Health Conditions</p>
+                <ul class="token-list">
+                    {% for condition in user.health_conditions %}
+                        <li>{{ condition.title() }}</li>
+                    {% else %}
+                        <li>No conditions selected</li>
+                    {% endfor %}
+                </ul>
+                <div class="auth-actions">
+                    <a class="secondary-button" href="{{ url_for('profile') }}">Update Conditions</a>
+                </div>
+            </article>
+
+            <article class="result-card spotlight-card">
+                <p class="section-label">Saved Scans</p>
+                <div class="score-value">{{ scan_count }}</div>
+                <p class="hero-text">Reports saved to your account.</p>
+                <div class="auth-actions">
+                    <a class="secondary-button" href="{{ url_for('history') }}">View All History</a>
+                </div>
+            </article>
+        </section>
+
+        <section class="history-list">
+            <div class="results-header">
+                <div>
+                    <p class="eyebrow">Recent Reports</p>
+                    <h1>Latest scans</h1>
+                </div>
+                <a class="secondary-button" href="{{ url_for('history') }}">Open History</a>
+            </div>
+
+            {% if records %}
+                {% for record in records %}
+                    <article class="result-card history-card">
+                        <div>
+                            <p class="section-label">{{ record.created_at }}</p>
+                            <h2>{{ record.product_name or "Unnamed product" }}</h2>
+                            <p class="hero-text">{{ record.personalized_advice or "No personalized advice saved." }}</p>
+                        </div>
+                        <div class="history-score">
+                            <span class="classification-badge {{ (record.classification or 'Moderate').lower() }}">{{ record.classification or "Moderate" }}</span>
+                            <strong>{{ record.score if record.score is not none else "--" }}</strong>
+                            <a class="secondary-button" href="{{ url_for('history_detail', scan_id=record.id) }}">Open</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            {% else %}
+                <article class="result-card">
+                    <h2>No scans yet</h2>
+                    <p class="hero-text">Scan your first product and the saved report will appear here.</p>
+                </article>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

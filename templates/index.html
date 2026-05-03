@@ -118,15 +118,28 @@
 <div class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white font-headline-md">
                 Food Health Rating
             </div>
-<div class="hidden md:flex items-center gap-8 font-manrope antialiased text-sm font-medium">
+<div class="nav-links items-center gap-8 font-manrope antialiased text-sm font-medium">
 <a class="text-emerald-600 dark:text-emerald-400 font-bold border-b-2 border-emerald-600 pb-1" href="{{ url_for('index') }}">Home</a>
 <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('how_it_works') }}">How it Works</a>
 <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="#analyzer">Analyze</a>
-<a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="#">Ratings</a>
+{% if current_user %}
+<a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('dashboard') }}">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('history') }}">My History</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('profile') }}">Profile</a>
+{% else %}
+<a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('login') }}">Login</a>
+{% endif %}
 <!-- <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="#">About</a> -->
 </div>
 <div class="flex items-center gap-4">
-<a class="hidden md:block px-5 py-2.5 bg-primary text-on-primary rounded-xl font-label-md transition-transform duration-150 active:scale-95 shadow-sm" href="#analyzer">
+{% if current_user %}
+<form method="post" action="{{ url_for('logout') }}">
+<button class="nav-action px-5 py-2.5 bg-white border border-outline-variant text-on-surface rounded-xl font-label-md transition-transform duration-150 active:scale-95 shadow-sm" type="submit">Logout</button>
+</form>
+{% else %}
+<a class="nav-action px-5 py-2.5 bg-white border border-outline-variant text-on-surface rounded-xl font-label-md transition-transform duration-150 active:scale-95 shadow-sm" href="{{ url_for('signup') }}">Sign Up</a>
+{% endif %}
+<a class="nav-action px-5 py-2.5 bg-primary text-on-primary rounded-xl font-label-md transition-transform duration-150 active:scale-95 shadow-sm" href="#analyzer">
                     Get Started
                 </a>
 <button class="md:hidden p-2 text-on-surface">
@@ -173,6 +186,10 @@
                 </p>
 </div>
 <form id="analyze-form" class="upload-card">
+<label class="text-field" for="product-name-input">
+<span>Product name</span>
+<input id="product-name-input" name="product_name" type="text" placeholder="Example: protein bar, biscuits, chips">
+</label>
 <label id="drop-zone" class="drop-zone" for="image-input">
 <input id="image-input" name="image" type="file" accept="image/*" hidden>
 <div class="drop-icon">+</div>
@@ -219,6 +236,7 @@
 <span class="muted-chip">Automatic</span>
 </div>
 <p id="advice-text" class="advice-text"></p>
+<p id="personalized-advice" class="personalized-advice"></p>
 <div>
 <p class="section-label">Condition-Based Recommendations</p>
 <ul id="recommendations-list" class="advice-list recommendation-list"></ul>

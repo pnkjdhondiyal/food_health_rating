@@ -112,9 +112,17 @@
 <header class="fixed top-0 w-full z-50 border-b bg-white/90 backdrop-blur-md border-slate-200 shadow-sm">
 <div class="flex justify-between items-center max-w-7xl mx-auto px-6 h-16">
 <a class="text-xl font-bold tracking-tighter text-slate-900" href="{{ url_for('index') }}">Food Health Rating</a>
-<div class="flex items-center gap-6">
+<div class="nav-links items-center gap-6">
 <a class="font-manrope text-sm text-slate-600 hover:text-emerald-600 transition-colors" href="{{ url_for('index') }}">Home</a>
 <a class="font-manrope text-sm text-emerald-600 font-bold" href="{{ url_for('how_it_works') }}">How it Works</a>
+{% if current_user %}
+<a class="font-manrope text-sm text-slate-600 hover:text-emerald-600 transition-colors" href="{{ url_for('dashboard') }}">Dashboard</a>
+<a class="font-manrope text-sm text-slate-600 hover:text-emerald-600 transition-colors" href="{{ url_for('history') }}">My History</a>
+<a class="font-manrope text-sm text-slate-600 hover:text-emerald-600 transition-colors" href="{{ url_for('profile') }}">Profile</a>
+{% else %}
+<a class="font-manrope text-sm text-slate-600 hover:text-emerald-600 transition-colors" href="{{ url_for('login') }}">Sign In</a>
+<a class="font-manrope text-sm text-slate-600 hover:text-emerald-600 transition-colors" href="{{ url_for('signup') }}">Sign Up</a>
+{% endif %}
 <a class="bg-primary hover:bg-on-primary-fixed-variant text-white px-5 py-2 rounded-lg font-manrope text-sm font-medium transition-all active:scale-95" href="{{ url_for('index') }}#analyzer">Get Started</a>
 </div>
 </div>

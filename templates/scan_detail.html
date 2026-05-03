@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Scan - Food Health Rating</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="results-header">
+            <div>
+                <p class="eyebrow">{{ record.created_at }}</p>
+                <h1>{{ record.product_name or "Saved food report" }}</h1>
+                <p class="hero-text">{{ result.personalized_advice }}</p>
+            </div>
+            <a class="secondary-button" href="{{ url_for('history') }}">Back to History</a>
+        </section>
+
+        <section class="score-grid">
+            <article class="result-card spotlight-card">
+                <p class="section-label">Health Score</p>
+                <div class="score-value">{{ result.score if result.score is not none else "--" }}</div>
+                <div class="rating-row">
+                    <div class="star-rating">{{ result.star_count }}/5</div>
+                    <span class="rating-label">{{ result.rating }}</span>
+                </div>
+                <span class="classification-badge {{ result.classification.lower() }}">{{ result.classification }}</span>
+            </article>
+
+            <article class="result-card advice-card">
+                <p class="section-label">Personal Advice</p>
+                <p class="advice-text">{{ result.advice }}</p>
+                <p class="personalized-advice">{{ result.personalized_advice }}</p>
+            </article>
+        </section>
+
+        <section class="output-grid">
+            <article class="result-card">
+                <h2>Extracted Ingredients</h2>
+                <ul class="token-list">
+                    {% for ingredient in result.ingredients %}
+                        <li>{{ ingredient }}</li>
+                    {% else %}
+                        <li>No ingredients extracted.</li>
+                    {% endfor %}
+                </ul>
+            </article>
+
+            <article class="result-card">
+                <h2>OCR Text</h2>
+                <div class="ocr-box">{{ result.text }}</div>
+            </article>
+
+            <article class="result-card full-width-card">
+                <h2>Matched Ingredients</h2>
+                <div class="table-wrap">
+                    <table class="match-table">
+                        <thead>
+                            <tr>
+                                <th>OCR Ingredient</th>
+                                <th>Matched Ingredient</th>
+                                <th>Confidence</th>
+                                <th>Health Score</th>
+                                <th>Caution Conditions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in result.matched %}
+                                <tr>
+                                    <td>{{ item.ocr_ingredient }}</td>
+                                    <td>{{ item.matched_ingredient }}</td>
+                                    <td>{{ item.match_score }}</td>
+                                    <td>{{ item.health_score }}</td>
+                                    <td>{{ item.caution_conditions | join(", ") if item.caution_conditions else "None" }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5">No matched ingredients available.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+    </main>
+</body>
+</html>
