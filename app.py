@@ -77,7 +77,8 @@ def selected_conditions_from_form() -> list[str]:
 
 def personalize_advice(advice_result: dict, user: dict | None) -> dict:
     if not user:
-        advice_result["personalized_advice"] = "Log in and set your health profile to save this scan and get personalized warnings."
+        advice_result["personalized_advice"] = "Log in for personal recommendations."
+        advice_result["recommendation_status"] = "neutral"
         advice_result["profile_recommendations"] = []
         return advice_result
 
@@ -89,16 +90,55 @@ def personalize_advice(advice_result: dict, user: dict | None) -> dict:
     ]
 
     if not user_conditions:
-        personalized_advice = "Add health conditions to your profile for personalized warnings."
+        personalized_advice = "Add health conditions to get personal recommendations."
+        recommendation_status = "neutral"
     elif profile_recommendations:
         condition_names = ", ".join(recommendation["condition"] for recommendation in profile_recommendations)
-        personalized_advice = f"Personal warning for your profile: review the {condition_names} recommendation before eating this."
+        personalized_advice = f"Warning for you: review the {condition_names} recommendation before eating this."
+        recommendation_status = "warning"
     else:
-        personalized_advice = "No strong warning matched your saved health profile from the current dataset."
+        personalized_advice = "No strong warning for you."
+        recommendation_status = "safe"
 
     advice_result["personalized_advice"] = personalized_advice
+    advice_result["recommendation_status"] = recommendation_status
     advice_result["profile_recommendations"] = profile_recommendations
     return advice_result
+
+
+def get_important_ingredients(matched_ingredients: list[dict]) -> dict[str, list[dict]]:
+    important = {"hazards": [], "good": []}
+
+    for item in matched_ingredients:
+        matched_name = item.get("matched_ingredient", "")
+        if not matched_name or matched_name == "No good match found":
+            continue
+
+        score = float(item.get("health_score") or 0)
+        cautions = item.get("caution_conditions") or []
+        ingredient = {
+            "name": matched_name,
+            "ocr_name": item.get("ocr_ingredient", matched_name),
+            "score": score,
+            "cautions": cautions,
+        }
+
+        if cautions or score <= 1.5:
+            important["hazards"].append(ingredient)
+        elif score >= 3.5:
+            important["good"].append(ingredient)
+
+    important["hazards"] = important["hazards"][:6]
+    important["good"] = important["good"][:6]
+    return important
+
+
+def delete_uploaded_file(path: Path) -> None:
+    try:
+        if path.exists() and path.is_file():
+            path.unlink()
+    except OSError:
+        app.logger.warning("Could not delete uploaded file: %s", path)
 
 
 @app.route("/", methods=["GET"])
@@ -169,7 +209,20 @@ def logout():
 def dashboard():
     user = current_user()
     records = list_scan_records(user["id"])
-    return render_template("dashboard.html", user=user, records=records[:3], scan_count=len(records))
+    scored_records = [record for record in records if record.get("score") is not None]
+    average_score = round(
+        sum(float(record["score"]) for record in scored_records) / len(scored_records),
+        1,
+    ) if scored_records else 0
+    goal_achievement = int((average_score / 5) * 100) if average_score else 0
+    return render_template(
+        "dashboard.html",
+        user=user,
+        records=records[:3],
+        scan_count=len(records),
+        average_score=average_score,
+        goal_achievement=goal_achievement,
+    )
 
 
 @app.route("/profile", methods=["GET", "POST"])
@@ -202,6 +255,12 @@ def history_detail(scan_id: int):
     return render_template("scan_detail.html", record=record, result=record["result"])
 
 
+@app.route("/scan/<int:scan_id>", methods=["GET"])
+@login_required
+def scan_result(scan_id: int):
+    return history_detail(scan_id)
+
+
 @app.route("/analyze", methods=["POST"])
 def analyze():
     uploaded_file = request.files.get("image")
@@ -225,6 +284,7 @@ def analyze():
         score_result = calculate_health_rating(ingredients)
         advice_result = generate_health_advice(score_result["matched_ingredients"])
         advice_result = personalize_advice(advice_result, current_user())
+        important_ingredients = get_important_ingredients(score_result["matched_ingredients"])
 
         result = {
             "text": ocr_text,
@@ -236,9 +296,11 @@ def analyze():
             "classification": score_result["classification"],
             "advice": advice_result["advice"],
             "personalized_advice": advice_result["personalized_advice"],
+            "recommendation_status": advice_result["recommendation_status"],
             "better_options": advice_result["better_options"],
             "recommendations": advice_result["recommendations"],
             "profile_recommendations": advice_result["profile_recommendations"],
+            "important_ingredients": important_ingredients,
             "saved": False,
         }
 
@@ -251,6 +313,8 @@ def analyze():
         return jsonify(result)
     except Exception as exc:
         return jsonify({"error": f"Unable to process the image: {exc}"}), 500
+    finally:
+        delete_uploaded_file(save_path)
 
 
 if __name__ == "__main__":

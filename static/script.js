@@ -46,7 +46,7 @@ async function analyzeFile(file) {
         }
 
         sessionStorage.setItem("analysisResult", JSON.stringify(data));
-        window.location.href = "/results";
+        window.location.href = data.saved && data.scan_id ? `/scan/${data.scan_id}` : "/results";
     } catch (error) {
         showError(error.message || "Something went wrong while analyzing the image.");
     } finally {

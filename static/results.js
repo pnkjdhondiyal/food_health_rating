@@ -9,6 +9,8 @@ const adviceText = document.getElementById("advice-text");
 const personalizedAdvice = document.getElementById("personalized-advice");
 const recommendationsList = document.getElementById("recommendations-list");
 const betterOptions = document.getElementById("better-options");
+const hazardIngredients = document.getElementById("hazard-ingredients");
+const goodIngredients = document.getElementById("good-ingredients");
 
 function classificationClass(value) {
     return String(value || "Moderate").toLowerCase().replace(/\s+/g, "-");
@@ -51,11 +53,36 @@ function renderAdviceList(items) {
     });
 }
 
+function renderImportantIngredients(container, items, emptyText, type) {
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+    if (!items.length) {
+        const li = document.createElement("li");
+        li.className = "ingredient-chip neutral";
+        li.textContent = emptyText;
+        container.appendChild(li);
+        return;
+    }
+
+    items.forEach((item) => {
+        const li = document.createElement("li");
+        li.className = `ingredient-chip ${type}`;
+        const detail = item.cautions && item.cautions.length
+            ? ` • ${item.cautions.join(", ")}`
+            : ` • score ${item.score}`;
+        li.textContent = `${item.name}${detail}`;
+        container.appendChild(li);
+    });
+}
+
 function renderRecommendationList(items) {
     recommendationsList.innerHTML = "";
     if (!items.length) {
         const li = document.createElement("li");
-        li.textContent = "No strong illness-specific warning was detected from the current dataset.";
+        li.textContent = "No strong warning for you.";
         recommendationsList.appendChild(li);
         return;
     }
@@ -99,6 +126,18 @@ function renderResults(data) {
     renderPillList(ingredientList, data.ingredients || [], "No ingredients extracted");
     renderRecommendationList(data.recommendations || []);
     renderAdviceList(data.better_options || []);
+    renderImportantIngredients(
+        hazardIngredients,
+        data.important_ingredients?.hazards || [],
+        "No major hazard ingredient detected",
+        "hazard"
+    );
+    renderImportantIngredients(
+        goodIngredients,
+        data.important_ingredients?.good || [],
+        "No strong positive ingredient detected",
+        "good"
+    );
     renderMatches(data.matched || []);
     ocrText.textContent = data.text || "No OCR text returned.";
     adviceText.textContent = data.advice || "No advice available.";
