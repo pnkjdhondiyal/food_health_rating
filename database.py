@@ -117,9 +117,58 @@ def list_scan_records(user_id: int) -> list[dict[str, Any]]:
         record["score"] = result.get("score")
         record["classification"] = result.get("classification")
         record["rating"] = result.get("rating")
-        record["personalized_advice"] = result.get("personalized_advice")
+        record["personalized_advice"] = _clean_personalized_advice(result)
+        record["recommendation_status"] = _recommendation_status(result)
         records.append(record)
     return records
+
+
+def _important_from_result(result: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    if result.get("important_ingredients"):
+        return result["important_ingredients"]
+
+    important = {"hazards": [], "good": []}
+    for item in result.get("matched", []):
+        matched_name = item.get("matched_ingredient", "")
+        if not matched_name or matched_name == "No good match found":
+            continue
+
+        score = float(item.get("health_score") or 0)
+        cautions = item.get("caution_conditions") or []
+        ingredient = {
+            "name": matched_name,
+            "ocr_name": item.get("ocr_ingredient", matched_name),
+            "score": score,
+            "cautions": cautions,
+        }
+        if cautions or score <= 1.5:
+            important["hazards"].append(ingredient)
+        elif score >= 3.5:
+            important["good"].append(ingredient)
+
+    return important
+
+
+def _recommendation_status(result: dict[str, Any]) -> str:
+    status = result.get("recommendation_status")
+    if status:
+        return status
+
+    advice = str(result.get("personalized_advice", "")).lower()
+    if "no strong warning" in advice:
+        return "safe"
+    if "warning" in advice or "review" in advice:
+        return "warning"
+    return "neutral"
+
+
+def _clean_personalized_advice(result: dict[str, Any]) -> str:
+    advice = result.get("personalized_advice") or ""
+    if "No strong warning matched your saved health profile" in advice:
+        return "No strong warning for you."
+    if advice.startswith("Personal warning for your profile:"):
+        return advice.replace("Personal warning for your profile:", "Warning for you:", 1)
+    return advice
 
 
 def get_scan_record(user_id: int, scan_id: int) -> dict[str, Any] | None:
@@ -138,4 +187,7 @@ def get_scan_record(user_id: int, scan_id: int) -> dict[str, Any] | None:
 
     record = dict(row)
     record["result"] = json.loads(record["result_json"])
+    record["result"]["important_ingredients"] = _important_from_result(record["result"])
+    record["result"]["personalized_advice"] = _clean_personalized_advice(record["result"])
+    record["result"]["recommendation_status"] = _recommendation_status(record["result"])
     return record
