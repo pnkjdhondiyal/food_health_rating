@@ -58,60 +58,27 @@
                         <a href="{{ url_for('history') }}">Past Scans</a>
                     </div>
 
-                    {% if records %}
-                        {% for record in records %}
-                            <article class="activity-card">
-                                <div class="activity-thumb">
-                                    <span>{{ loop.index }}</span>
-                                </div>
-                                <div class="activity-copy">
-                                    <h3>{{ record.product_name or "Unnamed product" }}</h3>
-                                    <p>{{ record.created_at }}</p>
-                                    <span class="activity-alert {{ record.recommendation_status or 'warning' }}">
-                                        {{ record.personalized_advice or "Scan saved for later review." }}
-                                    </span>
-                                </div>
-                                <div class="activity-score">
-                                    <strong>{{ record.score if record.score is not none else "--" }}</strong>
-                                    <span>Rating</span>
-                                    <a href="{{ url_for('history_detail', scan_id=record.id) }}">Open</a>
-                                </div>
-                            </article>
-                        {% endfor %}
-                    {% else %}
-                        <article class="activity-card">
-                            <div class="activity-thumb empty-thumb">+</div>
-                            <div class="activity-copy">
-                                <h3>No scans yet</h3>
-                                <p>Start by scanning your first packaged food label.</p>
-                                <span class="activity-alert safe">Your reports will appear here automatically.</span>
-                            </div>
-                            <div class="activity-score">
-                                <a href="{{ url_for('index') }}#analyzer">Scan</a>
-                            </div>
-                        </article>
-                    {% endif %}
-                </section>
-            </div>
-
-            <aside class="vitality-panel">
-                <h2>Vitality Progress</h2>
-                <div class="vitality-bars" aria-hidden="true">
-                    <div class="v-bar"><div class="v-track"><span style="height: 38%"></span></div><small>M</small></div>
-                    <div class="v-bar"><div class="v-track"><span style="height: 72%"></span></div><small>T</small></div>
-                    <div class="v-bar"><div class="v-track"><span style="height: 58%"></span></div><small>W</small></div>
-                    <div class="v-bar"><div class="v-track"><span style="height: 88%"></span></div><small>T</small></div>
-                    <div class="v-bar"><div class="v-track"><span style="height: 24%"></span></div><small>F</small></div>
-                </div>
-                <div class="metric-row">
-                    <span>Average Rating</span>
-                    <strong>{{ average_score }} / 5</strong>
-                </div>
-                <div class="metric-row">
-                    <span>Goal Achievement</span>
-                    <strong>{{ goal_achievement }}%</strong>
-                </div>
-            </aside>
+            {% if records %}
+                {% for record in records %}
+                    <article class="result-card history-card">
+                        <div>
+                            <p class="section-label">{{ record.created_at }}</p>
+                            <h2>{{ record.product_name or "Unnamed product" }}</h2>
+                            <p class="hero-text">{{ record.personalized_advice or "No personalized advice saved." }}</p>
+                        </div>
+                        <div class="history-score">
+                            <span class="classification-badge {{ (record.classification or 'Moderate').lower() }}">{{ record.classification or "Moderate" }}</span>
+                            <strong>{{ record.score if record.score is not none else "--" }}</strong>
+                            <a class="secondary-button" href="{{ url_for('history_detail', scan_id=record.id) }}">Open</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            {% else %}
+                <article class="result-card">
+                    <h2>No scans yet</h2>
+                    <p class="hero-text">Scan your first product and the saved report will appear here.</p>
+                </article>
+            {% endif %}
         </section>
     </main>
 </body>

@@ -124,7 +124,7 @@
 <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="#analyzer">Analyze</a>
 {% if current_user %}
 <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('dashboard') }}">Dashboard</a>
-<!-- <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('history') }}">My History</a> -->
+<a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('history') }}">My History</a>
 <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('profile') }}">Profile</a>
 {% else %}
 <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('login') }}">Login</a>
@@ -137,11 +137,13 @@
 <button class="nav-action px-5 py-2.5 bg-white border border-outline-variant text-on-surface rounded-xl font-label-md transition-transform duration-150 active:scale-95 shadow-sm" type="submit">Logout</button>
 </form>
 {% else %}
-<a class="nav-action px-5 py-2.5 bg-white border border-outline-variant text-on-surface rounded-xl font-label-md transition-transform duration-150 active:scale-95 shadow-sm" href="{{ url_for('signup') }}">Sign Up</a>
+<a class="nav-action px-5 py-2.5 bg-white border border-outline-variant text-on-surface rounded-xl font-label-md transition-transform duration-150 active:scale-95 shadow-sm" href="{{ url_for('login') }}">Sign In</a>
 {% endif %}
-<a class="nav-action px-5 py-2.5 bg-primary text-on-primary rounded-xl font-label-md transition-transform duration-150 active:scale-95 shadow-sm" href="#analyzer">
-                    Get Started
+{% if not current_user %}
+<a class="nav-action px-5 py-2.5 bg-primary text-on-primary rounded-xl font-label-md transition-transform duration-150 active:scale-95 shadow-sm" href="{{ url_for('signup') }}">
+                    Sign Up
                 </a>
+{% endif %}
 <button class="md:hidden p-2 text-on-surface">
 <span class="material-symbols-outlined">menu</span>
 </button>
@@ -182,9 +184,27 @@
 <p class="eyebrow">Live Analyzer</p>
 <h1>Upload a label and get the health report.</h1>
 <p class="hero-text">
-                    Add a packaged food ingredient image and the app will extract the text, match ingredients, score the product, and suggest who should avoid or limit it.
+                    Create a health profile first, then upload a packaged food ingredient image to get a personalized report.
                 </p>
 </div>
+{% if not current_user %}
+<div class="profile-required-card">
+<h2>Create your profile before scanning</h2>
+<p>Food analysis is personalized, so you need an account and health profile before using the scanner.</p>
+<div class="auth-actions">
+<a class="primary-button" href="{{ url_for('signup') }}">Sign Up</a>
+<a class="secondary-button" href="{{ url_for('login') }}">Sign In</a>
+</div>
+</div>
+{% elif not current_user.health_conditions %}
+<div class="profile-required-card">
+<h2>Complete your health profile</h2>
+<p>Select your health conditions so recommendations can be tailored to you.</p>
+<div class="auth-actions">
+<a class="primary-button" href="{{ url_for('profile') }}">Complete Profile</a>
+</div>
+</div>
+{% else %}
 <form id="analyze-form" class="upload-card">
 <label class="text-field" for="product-name-input">
 <span>Product name</span>
@@ -204,6 +224,7 @@
 </div>
 <p id="error-message" class="error-message hidden" aria-live="polite"></p>
 </form>
+{% endif %}
 </div>
 <section id="results-panel" class="results-panel hidden mt-8">
 <div class="results-header">

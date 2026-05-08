@@ -7,6 +7,8 @@ const analyzeButton = document.getElementById("analyze-button");
 const loadingState = document.getElementById("loading-state");
 const errorMessage = document.getElementById("error-message");
 
+if (form && dropZone && imageInput && productNameInput && fileName && analyzeButton && loadingState && errorMessage) {
+
 function setLoading(isLoading) {
     analyzeButton.disabled = isLoading;
     loadingState.classList.toggle("hidden", !isLoading);
@@ -42,6 +44,14 @@ async function analyzeFile(file) {
 
         const data = await response.json();
         if (!response.ok) {
+            if (response.status === 401) {
+                window.location.href = "/signup";
+                return;
+            }
+            if (response.status === 403) {
+                window.location.href = "/profile";
+                return;
+            }
             throw new Error(data.error || "Analysis failed.");
         }
 
@@ -94,3 +104,5 @@ dropZone.addEventListener("drop", (event) => {
     imageInput.files = event.dataTransfer.files;
     updateFileName(file);
 });
+
+}

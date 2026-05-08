@@ -1,5 +1,6 @@
 import os
 import uuid
+from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
 
@@ -106,41 +107,6 @@ def personalize_advice(advice_result: dict, user: dict | None) -> dict:
     return advice_result
 
 
-def get_important_ingredients(matched_ingredients: list[dict]) -> dict[str, list[dict]]:
-    important = {"hazards": [], "good": []}
-
-    for item in matched_ingredients:
-        matched_name = item.get("matched_ingredient", "")
-        if not matched_name or matched_name == "No good match found":
-            continue
-
-        score = float(item.get("health_score") or 0)
-        cautions = item.get("caution_conditions") or []
-        ingredient = {
-            "name": matched_name,
-            "ocr_name": item.get("ocr_ingredient", matched_name),
-            "score": score,
-            "cautions": cautions,
-        }
-
-        if cautions or score <= 1.5:
-            important["hazards"].append(ingredient)
-        elif score >= 3.5:
-            important["good"].append(ingredient)
-
-    important["hazards"] = important["hazards"][:6]
-    important["good"] = important["good"][:6]
-    return important
-
-
-def delete_uploaded_file(path: Path) -> None:
-    try:
-        if path.exists() and path.is_file():
-            path.unlink()
-    except OSError:
-        app.logger.warning("Could not delete uploaded file: %s", path)
-
-
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
@@ -209,20 +175,7 @@ def logout():
 def dashboard():
     user = current_user()
     records = list_scan_records(user["id"])
-    scored_records = [record for record in records if record.get("score") is not None]
-    average_score = round(
-        sum(float(record["score"]) for record in scored_records) / len(scored_records),
-        1,
-    ) if scored_records else 0
-    goal_achievement = int((average_score / 5) * 100) if average_score else 0
-    return render_template(
-        "dashboard.html",
-        user=user,
-        records=records[:3],
-        scan_count=len(records),
-        average_score=average_score,
-        goal_achievement=goal_achievement,
-    )
+    return render_template("dashboard.html", user=user, records=records[:3], scan_count=len(records))
 
 
 @app.route("/profile", methods=["GET", "POST"])
@@ -263,6 +216,13 @@ def scan_result(scan_id: int):
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
+    user = current_user()
+    if user is None:
+        return jsonify({"error": "Please sign in and create your health profile before analyzing food."}), 401
+
+    if not user.get("health_conditions"):
+        return jsonify({"error": "Please complete your health profile before analyzing food."}), 403
+
     uploaded_file = request.files.get("image")
     product_name = request.form.get("product_name", "").strip()
 
@@ -304,11 +264,9 @@ def analyze():
             "saved": False,
         }
 
-        user = current_user()
-        if user:
-            scan_id = create_scan_record(user["id"], product_name, unique_name, result)
-            result["saved"] = True
-            result["scan_id"] = scan_id
+        scan_id = create_scan_record(user["id"], product_name, unique_name, result)
+        result["saved"] = True
+        result["scan_id"] = scan_id
 
         return jsonify(result)
     except Exception as exc:
