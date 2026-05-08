@@ -72,6 +72,28 @@
                 <p class="advice-text">{{ result.advice }}</p>
                 <p class="personalized-advice {{ result.recommendation_status }}">{{ result.personalized_advice }}</p>
             </article>
+
+            <article class="result-card snack-card">
+                <div class="card-heading">
+                    <h2>Better Snacks For You</h2>
+                    <span class="muted-chip">Personalized</span>
+                </div>
+                <div class="snack-list">
+                    {% for snack in result.snack_recommendations %}
+                        <article class="snack-option">
+                            <h3>{{ snack.snack_name }}</h3>
+                            <p>{{ snack.reason }}</p>
+                            <div class="snack-tags">
+                                {% for tag in snack.tags %}
+                                    <span>{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                        </article>
+                    {% else %}
+                        <p class="hero-text">No better snack suggestions available for this scan yet.</p>
+                    {% endfor %}
+                </div>
+            </article>
         </section>
     </main>
 </body>

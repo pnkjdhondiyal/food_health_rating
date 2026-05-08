@@ -29,6 +29,12 @@
                             <p class="section-label">{{ record.created_at }}</p>
                             <h2>{{ record.product_name or "Unnamed product" }}</h2>
                             <p class="history-advice {{ record.recommendation_status or 'warning' }}">{{ record.personalized_advice or "Scan saved for later review." }}</p>
+                            {% if record.snack_recommendations %}
+                                <div class="mini-snack-row">
+                                    <span>Better snack:</span>
+                                    <strong>{{ record.snack_recommendations[0].snack_name }}</strong>
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="history-score">
                             <span class="classification-badge {{ (record.classification or 'Moderate').lower() }}">{{ record.classification or "Moderate" }}</span>

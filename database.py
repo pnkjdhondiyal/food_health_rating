@@ -3,6 +3,8 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
+from advisory.snack_recommender import recommend_better_snacks
+
 
 BASE_DIR = Path(__file__).resolve().parent
 DATABASE_PATH = BASE_DIR / "food_health.sqlite3"
@@ -119,6 +121,7 @@ def list_scan_records(user_id: int) -> list[dict[str, Any]]:
         record["rating"] = result.get("rating")
         record["personalized_advice"] = _clean_personalized_advice(result)
         record["recommendation_status"] = _recommendation_status(result)
+        record["snack_recommendations"] = _snacks_from_result(result)
         records.append(record)
     return records
 
@@ -171,6 +174,20 @@ def _clean_personalized_advice(result: dict[str, Any]) -> str:
     return advice
 
 
+def _snacks_from_result(result: dict[str, Any]) -> list[dict[str, Any]]:
+    if result.get("snack_recommendations"):
+        return result["snack_recommendations"]
+
+    user_conditions = []
+    for recommendation in result.get("profile_recommendations", []):
+        condition = recommendation.get("condition")
+        if condition:
+            user_conditions.append(str(condition).lower())
+
+    recommendations = result.get("profile_recommendations") or result.get("recommendations") or []
+    return recommend_better_snacks(user_conditions, recommendations)
+
+
 def get_scan_record(user_id: int, scan_id: int) -> dict[str, Any] | None:
     with get_connection() as connection:
         row = connection.execute(
@@ -190,4 +207,5 @@ def get_scan_record(user_id: int, scan_id: int) -> dict[str, Any] | None:
     record["result"]["important_ingredients"] = _important_from_result(record["result"])
     record["result"]["personalized_advice"] = _clean_personalized_advice(record["result"])
     record["result"]["recommendation_status"] = _recommendation_status(record["result"])
+    record["result"]["snack_recommendations"] = _snacks_from_result(record["result"])
     return record

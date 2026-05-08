@@ -9,6 +9,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
 from advisory.recommender import generate_health_advice
+from advisory.snack_recommender import recommend_better_snacks
 from database import (
     create_scan_record,
     create_user,
@@ -105,6 +106,51 @@ def personalize_advice(advice_result: dict, user: dict | None) -> dict:
     advice_result["recommendation_status"] = recommendation_status
     advice_result["profile_recommendations"] = profile_recommendations
     return advice_result
+
+
+def get_important_ingredients(matched_ingredients: list[dict]) -> dict[str, list[dict]]:
+    important = {"hazards": [], "good": []}
+
+    for item in matched_ingredients:
+        matched_name = item.get("matched_ingredient", "")
+        if not matched_name or matched_name == "No good match found":
+            continue
+
+        score = float(item.get("health_score") or 0)
+        cautions = item.get("caution_conditions") or []
+        ingredient = {
+            "name": matched_name,
+            "ocr_name": item.get("ocr_ingredient", matched_name),
+            "score": score,
+            "cautions": cautions,
+        }
+
+        if cautions or score <= 1.5:
+            important["hazards"].append(ingredient)
+        elif score >= 3.5:
+            important["good"].append(ingredient)
+
+    important["hazards"] = important["hazards"][:6]
+    important["good"] = important["good"][:6]
+    return important
+
+
+def delete_uploaded_file(path: Path) -> None:
+    try:
+        if path.exists() and path.is_file():
+            path.unlink()
+    except OSError:
+        app.logger.warning("Could not delete uploaded file: %s", path)
+
+
+def cleanup_upload_folder() -> None:
+    UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
+    for path in UPLOAD_FOLDER.iterdir():
+        if path.is_file():
+            delete_uploaded_file(path)
+
+
+cleanup_upload_folder()
 
 
 @app.route("/", methods=["GET"])
@@ -243,8 +289,12 @@ def analyze():
         ingredients = extract_ingredients(ocr_text)
         score_result = calculate_health_rating(ingredients)
         advice_result = generate_health_advice(score_result["matched_ingredients"])
-        advice_result = personalize_advice(advice_result, current_user())
+        advice_result = personalize_advice(advice_result, user)
         important_ingredients = get_important_ingredients(score_result["matched_ingredients"])
+        snack_recommendations = recommend_better_snacks(
+            user.get("health_conditions", []),
+            advice_result["profile_recommendations"] or advice_result["recommendations"],
+        )
 
         result = {
             "text": ocr_text,
@@ -261,6 +311,7 @@ def analyze():
             "recommendations": advice_result["recommendations"],
             "profile_recommendations": advice_result["profile_recommendations"],
             "important_ingredients": important_ingredients,
+            "snack_recommendations": snack_recommendations,
             "saved": False,
         }
 

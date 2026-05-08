@@ -332,6 +332,69 @@ body {
     background: linear-gradient(135deg, rgba(235, 249, 241, 0.94), rgba(255, 255, 255, 0.94));
 }
 
+.snack-card {
+    border-color: rgba(31, 111, 82, 0.22);
+    background: linear-gradient(135deg, rgba(241, 251, 246, 0.96), rgba(255, 255, 255, 0.96));
+}
+
+.snack-list {
+    display: grid;
+    gap: 12px;
+}
+
+.snack-option {
+    padding: 14px;
+    border: 1px solid rgba(31, 111, 82, 0.12);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.snack-option h3,
+.snack-option p {
+    margin: 0;
+}
+
+.snack-option h3 {
+    color: var(--accent-dark);
+    font-size: 1.08rem;
+}
+
+.snack-option p {
+    margin-top: 6px;
+    color: var(--muted);
+    line-height: 1.45;
+}
+
+.snack-tags,
+.mini-snack-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.snack-tags span {
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: var(--green-soft);
+    color: var(--accent-dark);
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.mini-snack-row {
+    align-items: center;
+    width: fit-content;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: var(--green-soft);
+    color: var(--accent-dark);
+}
+
+.mini-snack-row span {
+    color: var(--muted);
+}
+
 .important-card {
     border-radius: 18px;
 }
@@ -675,9 +738,9 @@ body {
 }
 
 .dashboard-shell {
-    width: min(1180px, calc(100% - 32px));
+    width: min(1220px, calc(100% - 32px));
     margin: 0 auto;
-    padding: 28px 0 56px;
+    padding: 28px 0 64px;
 }
 
 .dashboard-welcome {
@@ -735,13 +798,12 @@ body {
 }
 
 .dashboard-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
-    gap: 28px;
+    display: block;
     margin-top: 28px;
 }
 
 .dashboard-main {
+    width: 100%;
     min-width: 0;
 }
 
@@ -779,8 +841,13 @@ body {
 .section-row h2,
 .activity-copy h3 {
     margin: 0;
-    font-size: clamp(2.3rem, 5vw, 4rem);
-    line-height: 1;
+    font-size: clamp(1.45rem, 2.2vw, 2rem);
+    line-height: 1.1;
+}
+
+.dashboard-history-card {
+    width: 100%;
+    margin-bottom: 16px;
 }
 
 .activity-score span {

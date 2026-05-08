@@ -124,8 +124,8 @@
 <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="#analyzer">Analyze</a>
 {% if current_user %}
 <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('dashboard') }}">Dashboard</a>
-<a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('history') }}">My History</a>
-<a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('profile') }}">Profile</a>
+<!-- <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('history') }}">My History</a> -->
+<!-- <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('profile') }}">Profile</a> -->
 {% else %}
 <a class="text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors duration-200" href="{{ url_for('login') }}">Login</a>
 {% endif %}
