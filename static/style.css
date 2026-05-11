@@ -955,3 +955,236 @@ body {
         justify-items: start;
     }
 }
+
+/* Nutrient feature styles */
+.score-breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.score-source-card {
+    border-color: rgba(31, 111, 82, 0.14);
+    background: linear-gradient(135deg, rgba(240, 250, 245, 0.96), rgba(255, 255, 255, 0.96));
+}
+
+.score-source-value {
+    display: block;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    line-height: 1;
+    font-weight: 800;
+    margin: 10px 0 12px;
+    color: var(--accent);
+}
+
+.nutrient-warnings-card {
+    border-color: rgba(207, 79, 67, 0.22);
+    background: linear-gradient(135deg, rgba(253, 225, 221, 0.5), rgba(255, 255, 255, 0.96));
+}
+
+.nutrient-table-card {
+    border-color: rgba(31, 111, 82, 0.14);
+}
+
+.history-advice.warning {
+    color: #a40000;
+    font-weight: 600;
+}
+
+.history-advice.safe {
+    color: #096044;
+    font-weight: 600;
+}
+
+.history-advice.neutral {
+    color: var(--muted);
+}
+
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+}
+
+.app-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 16px 24px;
+}
+
+.brand-link {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent-dark);
+    text-decoration: none;
+}
+
+.latest-activity {
+    margin-top: 28px;
+}
+
+.section-row {
+    margin-bottom: 16px;
+}
+
+.section-row a {
+    color: var(--accent);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.dash-icon {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.dash-number {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--accent-dark);
+}
+
+.dash-link {
+    color: var(--accent);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.dash-pill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+}
+
+.danger-pill {
+    padding: 7px 13px;
+    border-radius: 999px;
+    background: var(--red-soft);
+    color: var(--red);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.soft-pill {
+    padding: 7px 13px;
+    border-radius: 999px;
+    background: rgba(31, 111, 82, 0.08);
+    color: var(--accent-dark);
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+@media (max-width: 920px) {
+    .score-breakdown-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Nutrient log / tracker styles */
+.nutrient-tracker-card {
+    border-color: rgba(31, 111, 82, 0.18);
+}
+
+.nutrient-bar-grid {
+    display: grid;
+    gap: 18px;
+    margin-top: 8px;
+}
+
+.nutrient-bar-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 6px 12px;
+    align-items: center;
+}
+
+.nutrient-bar-label {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.nutrient-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.nutrient-value {
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.nutrient-value.ok   { color: var(--accent); }
+.nutrient-value.warn { color: var(--yellow); }
+.nutrient-value.over { color: var(--red); }
+
+.bar-track {
+    grid-column: 1;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(31, 111, 82, 0.1);
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.bar-ok   { background: var(--green); }
+.bar-warn { background: var(--yellow); }
+.bar-over { background: var(--red); }
+
+.bar-pct {
+    grid-column: 2;
+    font-size: 0.82rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.bar-pct.ok   { color: var(--accent); }
+.bar-pct.warn { color: var(--yellow); }
+.bar-pct.over { color: var(--red); }
+
+.log-date-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.active-date-pill {
+    background: var(--accent) !important;
+    color: white !important;
+}
+
+.date-picker-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.date-picker-form input[type="date"] {
+    border: 1px solid rgba(33, 71, 53, 0.14);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font: inherit;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.95);
+}

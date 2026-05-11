@@ -77,6 +77,39 @@
                 </article>
             </div>
 
+            <!-- Score breakdown -->
+            <div id="score-breakdown" class="score-breakdown-grid"></div>
+
+            <!-- Nutrient condition warnings -->
+            <article class="result-card nutrient-warnings-card hidden">
+                <div class="card-heading">
+                    <h2>Nutrient Warnings</h2>
+                    <span class="muted-chip">Based on your conditions</span>
+                </div>
+                <ul id="nutrient-warnings" class="advice-list"></ul>
+            </article>
+
+            <!-- Nutrient breakdown table -->
+            <article class="result-card nutrient-table-card hidden">
+                <div class="card-heading">
+                    <h2>Nutrient Breakdown</h2>
+                    <span class="muted-chip">Per 100g</span>
+                </div>
+                <div class="table-wrap">
+                    <table class="match-table">
+                        <thead>
+                            <tr>
+                                <th>Nutrient</th>
+                                <th>Value</th>
+                                <th>Unit</th>
+                                <th>Score (0–5)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="nutrient-table-body"></tbody>
+                    </table>
+                </div>
+            </article>
+
             <div class="important-grid">
                 <article class="result-card important-card hazard-card">
                     <div class="card-heading">

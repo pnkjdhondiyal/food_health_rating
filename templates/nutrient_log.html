@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrient Log - Food Health Rating</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dashboard-body">
+    <header class="app-header">
+        <nav class="app-nav">
+            <a class="brand-link" href="{{ url_for('dashboard') }}">Food Health Rating</a>
+            <div class="nav-links">
+                <a class="secondary-button" href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a class="secondary-button" href="{{ url_for('history') }}">Past Scans</a>
+                <a class="primary-button" href="{{ url_for('index') }}#analyzer">Scan Product</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="dashboard-shell">
+
+        <section class="results-header">
+            <div>
+                <p class="eyebrow">Daily Tracker</p>
+                <h1>Nutrient Log</h1>
+                <p class="hero-text">Track how much of each nutrient you have consumed today across all scanned products.</p>
+            </div>
+            <!-- Date picker -->
+            <form method="get" action="{{ url_for('nutrient_log') }}" class="date-picker-form">
+                <label class="text-field">
+                    <span>View date</span>
+                    <input type="date" name="date" value="{{ selected_date }}" onchange="this.form.submit()">
+                </label>
+            </form>
+        </section>
+
+        {% if logged_dates %}
+        <section class="log-date-pills">
+            {% for d in logged_dates[:10] %}
+                <a class="soft-pill {% if d == selected_date %}active-date-pill{% endif %}"
+                   href="{{ url_for('nutrient_log', date=d) }}">{{ d }}</a>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if daily_totals %}
+
+        <!-- Progress bars for key nutrients -->
+        <section class="result-card nutrient-tracker-card">
+            <div class="card-heading">
+                <h2>Today's Intake vs Daily Limit</h2>
+                <span class="muted-chip">{{ selected_date }}</span>
+            </div>
+
+            <div class="nutrient-bar-grid">
+                {% set key_nutrients = [
+                    'energy', 'total_fat', 'saturated_fat', 'trans_fat',
+                    'sodium', 'total_sugars', 'added_sugars',
+                    'dietary_fiber', 'protein', 'total_carbohydrates'
+                ] %}
+
+                {% for nutrient in key_nutrients %}
+                    {% if nutrient in daily_totals %}
+                        {% set entry = daily_totals[nutrient] %}
+                        {% set limit_info = daily_limits.get(nutrient) %}
+                        {% set total = entry.total %}
+                        {% set limit = limit_info.limit if limit_info else none %}
+                        {% set unit = entry.unit %}
+
+                        {% if limit %}
+                            {% set pct = [(total / limit * 100), 100] | min | round(1) %}
+                            {% if pct >= 100 %}
+                                {% set bar_class = "bar-over" %}
+                                {% set status = "over" %}
+                            {% elif pct >= 75 %}
+                                {% set bar_class = "bar-warn" %}
+                                {% set status = "warn" %}
+                            {% else %}
+                                {% set bar_class = "bar-ok" %}
+                                {% set status = "ok" %}
+                            {% endif %}
+                        {% else %}
+                            {% set pct = 0 %}
+                            {% set bar_class = "bar-ok" %}
+                            {% set status = "ok" %}
+                        {% endif %}
+
+                        <div class="nutrient-bar-row">
+                            <div class="nutrient-bar-label">
+                                <span class="nutrient-name">{{ nutrient.replace('_', ' ').title() }}</span>
+                                <span class="nutrient-value {{ status }}">
+                                    {{ total }} {{ unit }}
+                                    {% if limit %} / {{ limit }} {{ unit }}{% endif %}
+                                </span>
+                            </div>
+                            {% if limit %}
+                            <div class="bar-track">
+                                <div class="bar-fill {{ bar_class }}" style="width: {{ pct }}%"></div>
+                            </div>
+                            <span class="bar-pct {{ status }}">{{ pct }}%</span>
+                            {% else %}
+                            <div class="bar-track">
+                                <div class="bar-fill bar-ok" style="width: 40%"></div>
+                            </div>
+                            <span class="bar-pct ok">no limit set</span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Per-scan breakdown -->
+        <section class="result-card">
+            <div class="card-heading">
+                <h2>Breakdown by Product</h2>
+                <span class="muted-chip">{{ log_entries | length }} entries</span>
+            </div>
+            <div class="table-wrap">
+                <table class="match-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Nutrient</th>
+                            <th>Amount</th>
+                            <th>Daily Limit</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in log_entries %}
+                            {% set limit_info = daily_limits.get(entry.nutrient) %}
+                            <tr>
+                                <td>{{ entry.product_name or "Unnamed" }}</td>
+                                <td>{{ entry.nutrient.replace('_', ' ').title() }}</td>
+                                <td>{{ entry.value }} {{ entry.unit }}</td>
+                                <td>
+                                    {% if limit_info and limit_info.limit %}
+                                        {{ limit_info.limit }} {{ limit_info.unit }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>{{ entry.created_at }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        {% else %}
+        <article class="result-card">
+            <h2>No data for {{ selected_date }}</h2>
+            <p class="hero-text">Scan a product that has a nutrition facts label and the nutrients will be logged here automatically.</p>
+            <a class="primary-button" href="{{ url_for('index') }}#analyzer" style="display:inline-block;margin-top:16px;">Scan a Product</a>
+        </article>
+        {% endif %}
+
+    </main>
+</body>
+</html>

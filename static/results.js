@@ -117,6 +117,59 @@ function renderMatches(matches) {
     });
 }
 
+function renderScoreBreakdown(data) {
+    const container = document.getElementById("score-breakdown");
+    if (!container) return;
+    const ingScore = data.ingredient_score !== null && data.ingredient_score !== undefined ? data.ingredient_score : "--";
+    const nutScore = data.nutrient_score !== null && data.nutrient_score !== undefined ? data.nutrient_score : "--";
+    container.innerHTML = `
+        <article class="result-card score-source-card">
+            <p class="section-label">Ingredient Score</p>
+            <strong class="score-source-value">${ingScore}</strong>
+            <p class="hero-text">Based on ingredient quality and health dataset matching.</p>
+        </article>
+        <article class="result-card score-source-card">
+            <p class="section-label">Nutrient Score</p>
+            <strong class="score-source-value">${nutScore}</strong>
+            <p class="hero-text">Based on per-100g nutrient quantities from the label.</p>
+        </article>
+    `;
+}
+
+function renderNutrientWarnings(warnings) {
+    const container = document.getElementById("nutrient-warnings");
+    if (!container) return;
+    container.innerHTML = "";
+    if (!warnings || !warnings.length) {
+        container.closest(".nutrient-warnings-card")?.classList.add("hidden");
+        return;
+    }
+    container.closest(".nutrient-warnings-card")?.classList.remove("hidden");
+    warnings.forEach((w) => {
+        const li = document.createElement("li");
+        const nutrientLabel = w.nutrient.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        li.innerHTML = `<strong>${w.condition.charAt(0).toUpperCase() + w.condition.slice(1)}</strong>: ${nutrientLabel} is ${w.value} (your limit: ${w.limit})`;
+        container.appendChild(li);
+    });
+}
+
+function renderNutrientTable(nutrients) {
+    const tbody = document.getElementById("nutrient-table-body");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    if (!nutrients || !nutrients.length) {
+        tbody.closest(".nutrient-table-card")?.classList.add("hidden");
+        return;
+    }
+    tbody.closest(".nutrient-table-card")?.classList.remove("hidden");
+    nutrients.forEach((n) => {
+        const row = document.createElement("tr");
+        const label = n.nutrient.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        row.innerHTML = `<td>${label}</td><td>${n.value}</td><td>${n.unit}</td><td>${n.score}</td>`;
+        tbody.appendChild(row);
+    });
+}
+
 function renderResults(data) {
     scoreValue.textContent = data.score === null ? "--" : data.score;
     ratingLabel.textContent = data.rating;
@@ -142,6 +195,9 @@ function renderResults(data) {
     ocrText.textContent = data.text || "No OCR text returned.";
     adviceText.textContent = data.advice || "No advice available.";
     personalizedAdvice.textContent = data.personalized_advice || "";
+    renderScoreBreakdown(data);
+    renderNutrientWarnings(data.nutrient_condition_warnings || []);
+    renderNutrientTable(data.scored_nutrients || []);
 }
 
 const savedResult = sessionStorage.getItem("analysisResult");

@@ -31,6 +31,71 @@
             </div>
         </section>
 
+        <!-- Score breakdown: ingredient vs nutrient -->
+        <section class="score-breakdown-grid">
+            <article class="result-card score-source-card">
+                <p class="section-label">Ingredient Score</p>
+                <strong class="score-source-value">{{ result.ingredient_score if result.ingredient_score is not none else "--" }}</strong>
+                <p class="hero-text">Based on ingredient quality and health dataset matching.</p>
+            </article>
+            <article class="result-card score-source-card">
+                <p class="section-label">Nutrient Score</p>
+                <strong class="score-source-value">{{ result.nutrient_score if result.nutrient_score is not none else "--" }}</strong>
+                <p class="hero-text">Based on per-100g nutrient quantities from the label.</p>
+            </article>
+        </section>
+
+        <!-- Nutrient condition warnings -->
+        {% if result.nutrient_condition_warnings %}
+        <section class="result-card nutrient-warnings-card">
+            <div class="card-heading">
+                <h2>Nutrient Warnings</h2>
+                <span class="muted-chip">Based on your conditions</span>
+            </div>
+            <ul class="advice-list">
+                {% for w in result.nutrient_condition_warnings %}
+                    <li>
+                        <strong>{{ w.condition.title() }}</strong>:
+                        {{ w.nutrient.replace("_", " ").title() }} is {{ w.value }}
+                        (your limit: {{ w.limit }})
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        <!-- Nutrient breakdown table -->
+        {% if result.scored_nutrients %}
+        <section class="result-card">
+            <div class="card-heading">
+                <h2>Nutrient Breakdown</h2>
+                <span class="muted-chip">Per 100g</span>
+            </div>
+            <div class="table-wrap">
+                <table class="match-table">
+                    <thead>
+                        <tr>
+                            <th>Nutrient</th>
+                            <th>Value</th>
+                            <th>Unit</th>
+                            <th>Score (0–5)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for n in result.scored_nutrients %}
+                            <tr>
+                                <td>{{ n.nutrient.replace("_", " ").title() }}</td>
+                                <td>{{ n.value }}</td>
+                                <td>{{ n.unit }}</td>
+                                <td>{{ n.score }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% endif %}
+
         <section class="important-grid">
             <article class="result-card important-card hazard-card">
                 <div class="card-heading">

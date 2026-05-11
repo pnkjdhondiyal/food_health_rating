@@ -51,6 +51,10 @@ def load_ingredient_dataset() -> Dict[str, Dict[str, object]]:
     return dataset
 
 
+# Cache dataset at module level — avoids reloading CSV on every scan
+_INGREDIENT_DATASET: Dict[str, Dict[str, object]] = load_ingredient_dataset()
+
+
 def get_rating(score: float) -> int:
     if score >= 4:
         return 5
@@ -81,7 +85,7 @@ def get_classification(score: float | None) -> str:
 
 def calculate_health_rating(ingredients: List[str]) -> Dict[str, object]:
     """Fuzzy match OCR ingredients to the dataset and compute the average score."""
-    ingredient_dataset = load_ingredient_dataset()
+    ingredient_dataset = _INGREDIENT_DATASET
     dataset_ingredients = list(ingredient_dataset.keys())
     normalized_lookup = {normalize_ingredient_name(name): name for name in dataset_ingredients}
     normalized_dataset = list(normalized_lookup.keys())
@@ -152,3 +156,19 @@ def calculate_health_rating(ingredients: List[str]) -> Dict[str, object]:
         "classification": get_classification(average_score),
         "matched_ingredients": matched_ingredients,
     }
+
+
+INGREDIENT_WEIGHT = 0.4
+NUTRIENT_WEIGHT = 0.6
+
+
+def combine_scores(ingredient_score: float | None, nutrient_score: float | None) -> float | None:
+    """Weighted combination of ingredient and nutrient scores."""
+    if ingredient_score is None and nutrient_score is None:
+        return None
+    if ingredient_score is None:
+        return nutrient_score
+    if nutrient_score is None:
+        return ingredient_score
+    combined = (ingredient_score * INGREDIENT_WEIGHT) + (nutrient_score * NUTRIENT_WEIGHT)
+    return round(combined, 2)

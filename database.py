@@ -38,6 +38,20 @@ def init_db() -> None:
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users (id)
             );
+
+            CREATE TABLE IF NOT EXISTS nutrient_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                scan_id INTEGER,
+                product_name TEXT,
+                nutrient TEXT NOT NULL,
+                value REAL NOT NULL,
+                unit TEXT NOT NULL,
+                logged_date TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users (id),
+                FOREIGN KEY (scan_id) REFERENCES scan_records (id)
+            );
             """
         )
 
@@ -186,6 +200,73 @@ def _snacks_from_result(result: dict[str, Any]) -> list[dict[str, Any]]:
 
     recommendations = result.get("profile_recommendations") or result.get("recommendations") or []
     return recommend_better_snacks(user_conditions, recommendations)
+
+
+def log_nutrients(
+    user_id: int,
+    scan_id: int,
+    product_name: str,
+    scored_nutrients: list[dict[str, Any]],
+    logged_date: str,
+) -> None:
+    """Insert one row per nutrient from a scan into nutrient_log."""
+    with get_connection() as connection:
+        connection.executemany(
+            """
+            INSERT INTO nutrient_log (user_id, scan_id, product_name, nutrient, value, unit, logged_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            [
+                (user_id, scan_id, product_name, n["nutrient"], n["value"], n["unit"], logged_date)
+                for n in scored_nutrients
+            ],
+        )
+
+
+def get_daily_totals(user_id: int, date: str) -> dict[str, dict[str, Any]]:
+    """Sum all nutrient values logged for a user on a given date (YYYY-MM-DD)."""
+    with get_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT nutrient, unit, SUM(value) as total
+            FROM nutrient_log
+            WHERE user_id = ? AND logged_date = ?
+            GROUP BY nutrient, unit
+            """,
+            (user_id, date),
+        ).fetchall()
+    return {row["nutrient"]: {"total": round(row["total"], 2), "unit": row["unit"]} for row in rows}
+
+
+def get_nutrient_log_by_date(user_id: int, date: str) -> list[dict[str, Any]]:
+    """Return each individual scan entry for a user on a given date."""
+    with get_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT nl.id, nl.product_name, nl.nutrient, nl.value, nl.unit,
+                   nl.scan_id, nl.created_at
+            FROM nutrient_log nl
+            WHERE nl.user_id = ? AND nl.logged_date = ?
+            ORDER BY nl.created_at ASC
+            """,
+            (user_id, date),
+        ).fetchall()
+    return [dict(row) for row in rows]
+
+
+def get_logged_dates(user_id: int) -> list[str]:
+    """Return all distinct dates that have nutrient log entries for a user."""
+    with get_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT DISTINCT logged_date
+            FROM nutrient_log
+            WHERE user_id = ?
+            ORDER BY logged_date DESC
+            """,
+            (user_id,),
+        ).fetchall()
+    return [row["logged_date"] for row in rows]
 
 
 def get_scan_record(user_id: int, scan_id: int) -> dict[str, Any] | None:

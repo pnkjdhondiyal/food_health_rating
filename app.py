@@ -1,6 +1,6 @@
 import os
 import uuid
-from datetime import datetime, timedelta
+from datetime import date
 from functools import wraps
 from pathlib import Path
 
@@ -13,16 +13,22 @@ from advisory.snack_recommender import recommend_better_snacks
 from database import (
     create_scan_record,
     create_user,
+    get_daily_totals,
+    get_logged_dates,
+    get_nutrient_log_by_date,
     get_scan_record,
     get_user_by_email,
     get_user_by_id,
     init_db,
     list_scan_records,
+    log_nutrients,
     update_user_conditions,
 )
+from nlp.nutrient_parser import extract_nutrients
 from nlp.parser import extract_ingredients
 from ocr.ocr_engine import extract_text
-from scoring.scorer import calculate_health_rating
+from scoring.nutrient_scorer import calculate_nutrient_score
+from scoring.scorer import calculate_health_rating, combine_scores, get_classification, get_rating, get_rating_label
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -286,13 +292,24 @@ def analyze():
 
     try:
         ocr_text = extract_text(str(save_path))
+        user_conditions = user.get("health_conditions", [])
+
         ingredients = extract_ingredients(ocr_text)
         score_result = calculate_health_rating(ingredients)
+
+        extracted_nutrients = extract_nutrients(ocr_text)
+        nutrient_result = calculate_nutrient_score(extracted_nutrients, user_conditions)
+
+        final_score = combine_scores(score_result["score"], nutrient_result["score"])
+        final_star_count = get_rating(final_score) if final_score is not None else 0
+        final_classification = get_classification(final_score)
+        final_rating_label = get_rating_label(final_score)
+
         advice_result = generate_health_advice(score_result["matched_ingredients"])
         advice_result = personalize_advice(advice_result, user)
         important_ingredients = get_important_ingredients(score_result["matched_ingredients"])
         snack_recommendations = recommend_better_snacks(
-            user.get("health_conditions", []),
+            user_conditions,
             advice_result["profile_recommendations"] or advice_result["recommendations"],
         )
 
@@ -300,10 +317,14 @@ def analyze():
             "text": ocr_text,
             "ingredients": ingredients,
             "matched": score_result["matched_ingredients"],
-            "score": score_result["score"],
-            "rating": score_result["rating_label"],
-            "star_count": score_result["star_count"],
-            "classification": score_result["classification"],
+            "ingredient_score": score_result["score"],
+            "nutrient_score": nutrient_result["score"],
+            "scored_nutrients": nutrient_result["scored_nutrients"],
+            "nutrient_condition_warnings": nutrient_result["condition_warnings"],
+            "score": final_score,
+            "rating": final_rating_label,
+            "star_count": final_star_count,
+            "classification": final_classification,
             "advice": advice_result["advice"],
             "personalized_advice": advice_result["personalized_advice"],
             "recommendation_status": advice_result["recommendation_status"],
@@ -319,11 +340,64 @@ def analyze():
         result["saved"] = True
         result["scan_id"] = scan_id
 
+        if nutrient_result["scored_nutrients"]:
+            log_nutrients(
+                user["id"],
+                scan_id,
+                product_name or unique_name,
+                nutrient_result["scored_nutrients"],
+                date.today().isoformat(),
+            )
+
         return jsonify(result)
     except Exception as exc:
         return jsonify({"error": f"Unable to process the image: {exc}"}), 500
     finally:
         delete_uploaded_file(save_path)
+
+
+@app.route("/nutrient-log", methods=["GET"])
+@login_required
+def nutrient_log():
+    user = current_user()
+    selected_date = request.args.get("date", date.today().isoformat())
+    daily_totals = get_daily_totals(user["id"], selected_date)
+    log_entries = get_nutrient_log_by_date(user["id"], selected_date)
+    logged_dates = get_logged_dates(user["id"])
+    daily_limits = _load_daily_limits(user.get("health_conditions", []))
+    return render_template(
+        "nutrient_log.html",
+        user=user,
+        selected_date=selected_date,
+        daily_totals=daily_totals,
+        log_entries=log_entries,
+        logged_dates=logged_dates,
+        daily_limits=daily_limits,
+    )
+
+
+def _load_daily_limits(user_conditions: list[str]) -> dict[str, dict]:
+    """Return per-nutrient daily limits, using condition-specific limits where applicable."""
+    import csv
+    limits: dict[str, dict] = {}
+    condition_set = {c.lower() for c in user_conditions}
+    limits_path = BASE_DIR / "data" / "nutrient_limits.csv"
+    with limits_path.open(encoding="utf-8-sig", newline="") as f:
+        for row in csv.DictReader(f):
+            nutrient = row["nutrient"].strip().lower()
+            general_limit = float(row["daily_limit"]) if row["daily_limit"] else None
+            condition = row.get("condition", "").strip().lower()
+            condition_limit = float(row["condition_limit"]) if row.get("condition_limit") else None
+            unit = row["unit"].strip()
+
+            if nutrient not in limits:
+                limits[nutrient] = {"limit": general_limit, "unit": unit}
+
+            # Override with stricter condition limit if user has that condition
+            if condition and condition in condition_set and condition_limit is not None:
+                if condition_limit < (limits[nutrient]["limit"] or float("inf")):
+                    limits[nutrient]["limit"] = condition_limit
+    return limits
 
 
 if __name__ == "__main__":
